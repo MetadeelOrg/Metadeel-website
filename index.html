@@ -36,8 +36,10 @@
     button, input, select { font: inherit; }
     a { color: inherit; text-decoration: none; }
     img { max-width: 100%; display: block; }
+    video { max-width: 100%; }
     .mono { font-family: "IBM Plex Mono", monospace; }
     .shell { width: min(1240px, calc(100% - 48px)); margin: auto; }
+    .split-2 > *, .tools-grid > *, .products > *, .band-grid > * { min-width: 0; }
     .eyebrow {
       display: inline-flex; align-items: center; gap: 8px;
       text-transform: uppercase; letter-spacing: .14em;
@@ -99,38 +101,57 @@
     @keyframes enter { from { opacity: 0; transform: translateY(10px); } }
 
     .hero {
-      min-height: calc(100vh - 72px);
-      display: grid; align-items: end;
-      position: relative; overflow: hidden;
-      background:
-        radial-gradient(ellipse 70% 55% at 78% 35%, rgba(30,201,138,.28), transparent 60%),
-        radial-gradient(ellipse 50% 40% at 15% 80%, rgba(13,110,110,.18), transparent 55%),
-        linear-gradient(160deg, #071410 0%, #0d2a22 45%, #12352c 100%);
+      min-height: clamp(520px, 68vh, 680px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      background: #071410;
       color: white;
     }
     .hero-copy {
       position: relative; z-index: 2;
-      padding: 12vh max(24px, calc((100vw - 1240px)/2)) 80px;
-      max-width: 760px;
+      box-sizing: border-box;
+      width: min(640px, calc(100% - 48px));
+      margin-left: max(24px, calc((100vw - 1240px) / 2));
+      margin-right: auto;
+      padding: 40px 0;
     }
     .hero .eyebrow { color: var(--mint); }
     .hero .eyebrow::before { background: var(--mint); }
-    .hero h1 { color: white; }
+    .hero h1 {
+      color: white;
+      font-size: clamp(34px, 4vw, 56px);
+      line-height: 1.08;
+      letter-spacing: -.04em;
+      margin-bottom: 18px;
+    }
     .hero p {
-      max-width: 520px; font-size: clamp(16px, 1.5vw, 19px);
-      line-height: 1.55; color: rgba(255,255,255,.72); margin-bottom: 28px;
+      max-width: 540px; font-size: clamp(15px, 1.2vw, 18px);
+      line-height: 1.55; color: rgba(255,255,255,.72); margin-bottom: 24px;
     }
     .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
     .hero-visual {
-      position: absolute; inset: 0; pointer-events: none;
+      position: absolute; inset: 0; z-index: 0; overflow: hidden;
+      pointer-events: none;
+    }
+    .hero-visual-video {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center center;
+    }
+    .hero-visual::after {
+      content: ""; position: absolute; inset: 0; z-index: 1;
       background:
-        url("https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=1800&q=80")
-        center/cover no-repeat;
-      opacity: .22; mix-blend-mode: luminosity;
+        linear-gradient(90deg, rgba(7,20,16,.82) 0%, rgba(7,20,16,.45) 48%, rgba(7,20,16,.28) 100%),
+        linear-gradient(180deg, rgba(7,20,16,.25) 0%, rgba(7,20,16,.45) 55%, rgba(7,20,16,.7) 100%);
     }
     .hero-stats {
-      position: absolute; z-index: 2; right: max(24px, calc((100vw - 1240px)/2));
-      bottom: 80px; display: grid; gap: 14px; width: min(340px, 40vw);
+      position: absolute; z-index: 2;
+      right: max(24px, calc((100vw - 1240px) / 2));
+      top: 50%; transform: translateY(-50%);
+      display: grid; gap: 12px; width: min(300px, 28vw);
     }
     .hero-stat {
       background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14);
@@ -231,12 +252,21 @@
     .tools-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 20px; }
     .tool-feature {
       padding: 40px; min-height: 360px; display: flex; flex-direction: column; justify-content: end;
-      background:
-        linear-gradient(180deg, transparent 20%, rgba(7,20,16,.85)),
-        url("https://images.unsplash.com/photo-1642790106117-e829e14bb061?auto=format&fit=crop&w=1400&q=80")
-        center/cover;
-      color: white; border-radius: var(--radius); position: relative;
+      background: #071410; color: white; border-radius: var(--radius);
+      position: relative; overflow: hidden; isolation: isolate;
     }
+    .tool-feature-video {
+      position: absolute; inset: 0; z-index: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
+      pointer-events: none;
+    }
+    .tool-feature::after {
+      content: ""; position: absolute; inset: 0; z-index: 1;
+      background: linear-gradient(180deg, transparent 18%, rgba(7,20,16,.88));
+      pointer-events: none;
+    }
+    .tool-feature > *:not(video) { position: relative; z-index: 2; }
     .tool-feature h3 { font-size: 32px; max-width: 360px; }
     .tool-feature p { color: rgba(255,255,255,.7); max-width: 340px; }
     .tool-stack { display: grid; gap: 16px; }
@@ -288,24 +318,210 @@
     .learn-item p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
 
     .cta-band {
-      padding: 80px 0; background: linear-gradient(120deg, var(--mint-deep), var(--teal));
-      color: white;
+      position: relative; overflow: hidden; padding: 110px 0; color: white;
+      background: #071410; isolation: isolate;
     }
-    .cta-band .shell { display: flex; align-items: center; justify-content: space-between; gap: 28px; }
-    .cta-band h2 { margin: 0; font-size: clamp(36px, 4.5vw, 60px); }
+    .cta-band-video {
+      position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%;
+      object-fit: cover; pointer-events: none;
+    }
+    .cta-band::after {
+      content: ""; position: absolute; inset: 0; z-index: 1;
+      background: linear-gradient(120deg, rgba(7,20,16,.78), rgba(13,110,110,.45));
+    }
+    .cta-band .shell {
+      position: relative; z-index: 2;
+      display: flex; align-items: center; justify-content: space-between; gap: 28px;
+    }
+    .cta-band h2 { margin: 0; font-size: clamp(36px, 4.5vw, 60px); max-width: 720px; text-shadow: 0 8px 30px rgba(0,0,0,.35); }
 
     .page-hero { padding: 90px 0 60px; border-bottom: 1px solid var(--line); }
     .page-hero p { font-size: 18px; line-height: 1.6; max-width: 640px; color: var(--muted); }
+    .page-hero.predict-hero,
+    .page-hero.trade-hero {
+      position: relative; overflow: hidden; isolation: isolate;
+      padding: 110px 0 80px; border-bottom: 0; background: #071410; color: white;
+      min-height: clamp(420px, 52vh, 560px);
+      display: flex; align-items: center;
+    }
+    .predict-hero-video,
+    .trade-hero-video {
+      position: absolute; inset: 0; z-index: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
+      pointer-events: none;
+    }
+    .predict-hero::after,
+    .trade-hero::after {
+      content: ""; position: absolute; inset: 0; z-index: 1;
+      background:
+        linear-gradient(90deg, rgba(7,20,16,.88) 0%, rgba(7,20,16,.55) 55%, rgba(7,20,16,.35) 100%),
+        linear-gradient(180deg, rgba(7,20,16,.2), rgba(7,20,16,.55));
+    }
+    .predict-hero .shell,
+    .trade-hero .shell { position: relative; z-index: 2; width: min(1240px, calc(100% - 48px)); }
+    .predict-hero .eyebrow,
+    .trade-hero .eyebrow { color: var(--mint); }
+    .predict-hero .eyebrow::before,
+    .trade-hero .eyebrow::before { background: var(--mint); }
+    .predict-hero h1,
+    .trade-hero h1 { color: white; }
+    .predict-hero p,
+    .trade-hero p { color: rgba(255,255,255,.72); }
+    .trade-hero .button.ghost { border-color: rgba(255,255,255,.35); color: white; }
+    .predict-hero .predict-tag {
+      background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.18); color: rgba(255,255,255,.78);
+    }
+    .predict-hero .predict-tag.active {
+      background: var(--mint); border-color: var(--mint); color: var(--ink);
+    }
     .markets-layout { display: grid; grid-template-columns: 1fr 320px; gap: 20px; padding: 48px 0 100px; }
     .market-table { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
     .market-head, .market-row {
-      display: grid; grid-template-columns: 1.4fr .8fr .7fr 1fr; gap: 12px;
+      display: grid; grid-template-columns: 1.6fr .7fr .7fr .9fr; gap: 12px;
       align-items: center; padding: 18px 22px;
     }
     .market-head { background: var(--paper); font: 11px "IBM Plex Mono", monospace; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
-    .market-row { border-top: 1px solid var(--line); }
+    .market-row { border-top: 1px solid var(--line); transition: .2s; }
+    .market-row:hover { background: rgba(30,201,138,.05); }
     .market-row strong { display: block; }
     .market-row small { color: var(--muted); }
+    .predict-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
+    .predict-tag {
+      border: 1px solid var(--line); background: var(--white); border-radius: 999px;
+      padding: 8px 14px; font: 500 12px "IBM Plex Mono", monospace; color: var(--muted);
+    }
+    .predict-tag.active { background: var(--ink); border-color: var(--ink); color: white; }
+    .predict-yes, .predict-no {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 72px; min-height: 36px; border-radius: 10px; font: 700 13px "IBM Plex Mono", monospace;
+    }
+    .predict-yes { background: rgba(15,159,104,.12); color: var(--up); }
+    .predict-no { background: rgba(214,69,61,.1); color: var(--down); }
+    .predict-features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 0 0 80px; }
+
+    .trade-split {
+      display: grid; grid-template-columns: 1.05fr .95fr; gap: 28px; align-items: center;
+      padding: 72px 0; border-bottom: 1px solid var(--line);
+    }
+    .trade-split.reverse { direction: rtl; }
+    .trade-split.reverse > * { direction: ltr; }
+    .trade-split h2 { margin-bottom: 14px; }
+    .trade-split p { color: var(--muted); line-height: 1.65; max-width: 520px; }
+    .trade-split .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+    .trade-media {
+      border-radius: var(--radius); overflow: hidden; min-height: 320px;
+      background: #0d2a22; position: relative;
+    }
+    .trade-media img,
+    .trade-media-video {
+      width: 100%; height: 100%; min-height: 320px; object-fit: cover;
+      object-position: center; display: block;
+    }
+    .trade-media-video {
+      position: absolute; inset: 0; min-height: 100%;
+    }
+    .trade-media.has-video { min-height: 360px; }
+    .trade-media.dark-panel {
+      background: linear-gradient(160deg, #0d2a22, #071410);
+      color: white; padding: 36px; display: flex; flex-direction: column; justify-content: end;
+      min-height: 360px;
+    }
+    .trade-media.dark-panel h3 { font-size: 28px; margin: 12px 0; }
+    .trade-media.dark-panel p { color: rgba(255,255,255,.62); margin: 0; }
+    .trade-media.illo {
+      background: #f3f6f4; padding: 28px; display: grid; place-items: center;
+      min-height: 360px;
+    }
+    .trade-media.illo picture,
+    .trade-media.illo img {
+      width: 100%; height: auto; min-height: 0; max-height: 320px; object-fit: contain;
+    }
+    .asset-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 28px 0 18px; }
+    .asset-tab {
+      border: 1px solid var(--line); background: var(--white); border-radius: 999px;
+      padding: 10px 18px; font-weight: 700; cursor: pointer; transition: .2s;
+    }
+    .asset-tab.active { background: var(--ink); border-color: var(--ink); color: white; }
+    .asset-panel { display: none; }
+    .asset-panel.active { display: block; animation: enter .35s ease; }
+    .trade-band {
+      background: var(--ink); color: white; padding: 80px 0; position: relative; overflow: hidden;
+    }
+    .trade-band .shell { position: relative; z-index: 1; }
+    .trade-band p { color: rgba(255,255,255,.65); max-width: 560px; line-height: 1.65; }
+    .trade-band .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+    .gold-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 20px; }
+    .gold-card {
+      position: relative; overflow: hidden; isolation: isolate;
+      background: #071410;
+      border: 1px solid rgba(30,201,138,.22); border-radius: var(--radius);
+      padding: 36px; color: white; min-height: 420px;
+      display: flex; flex-direction: column; justify-content: end;
+    }
+    .gold-card-bg {
+      position: absolute; inset: 0; z-index: 0;
+    }
+    .gold-card-bg picture,
+    .gold-card-bg img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .gold-card::after {
+      content: ""; position: absolute; inset: 0; z-index: 1;
+      background: linear-gradient(180deg, rgba(7,20,16,.25) 0%, rgba(7,20,16,.78) 55%, rgba(7,20,16,.92) 100%);
+    }
+    .gold-card > *:not(.gold-card-bg) { position: relative; z-index: 2; }
+    .gold-card h2 { margin-bottom: 12px; }
+    .gold-card p { color: rgba(255,255,255,.72); line-height: 1.6; }
+    .gold-perks { display: grid; gap: 12px; }
+    .gold-perk {
+      background: var(--white); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 22px 24px;
+    }
+    .gold-perk h3 { font-size: 18px; margin: 8px 0; }
+    .gold-perk p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+    .gold-perk .mono { color: var(--mint-deep); font-size: 12px; }
+    .trade-cta {
+      text-align: center; padding: 90px 0 100px;
+    }
+    .trade-cta h2 { max-width: 720px; margin: 0 auto 24px; }
+    .link-quiet {
+      display: inline-block; margin-top: 14px; font: 500 12px "IBM Plex Mono", monospace;
+      color: var(--teal); text-decoration: underline; text-underline-offset: 3px;
+    }
+    .trade-band .link-quiet { color: var(--mint); }
+    .futures-perks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .futures-perk {
+      background: var(--white); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 28px 24px; min-height: 220px;
+    }
+    .futures-perk h3 { font-size: 24px; margin: 12px 0; }
+    .futures-perk p { margin: 0; color: var(--muted); line-height: 1.55; font-size: 14px; }
+    .futures-perk .mono { color: var(--mint-deep); font-size: 12px; }
+    .futures-cats { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 18px; }
+    .futures-cat {
+      border: 1px solid var(--line); background: var(--white); border-radius: 999px;
+      padding: 9px 16px; font-weight: 700; cursor: pointer; font-size: 13px;
+    }
+    .futures-cat.active { background: var(--ink); border-color: var(--ink); color: white; }
+    .futures-table-wrap {
+      overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius);
+      background: var(--white); -webkit-overflow-scrolling: touch;
+    }
+    .futures-table { width: 100%; border-collapse: collapse; min-width: 780px; }
+    .futures-table th, .futures-table td {
+      padding: 16px 18px; text-align: left; border-bottom: 1px solid var(--line); font-size: 14px;
+    }
+    .futures-table th {
+      font: 500 11px "IBM Plex Mono", monospace; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--muted); background: var(--paper);
+    }
+    .futures-table tr:last-child td { border-bottom: 0; }
+    .futures-table td:first-child { font-weight: 700; font-family: "IBM Plex Mono", monospace; color: var(--mint-deep); }
+    .futures-note {
+      margin-top: 18px; padding: 14px 16px; border-radius: 12px;
+      background: rgba(30,201,138,.08); color: var(--ink-soft); font-size: 13px; line-height: 1.5;
+    }
     .spark { width: 100%; height: 32px; }
     .spark polyline { fill: none; stroke: var(--mint-deep); stroke-width: 2; }
     .watch-card { padding: 26px; position: sticky; top: 96px; height: fit-content; }
@@ -338,12 +554,20 @@
     .career-content p { max-width: 580px; font-size: 18px; line-height: 1.6; color: rgba(255,255,255,.72); }
     .jobs { display: grid; grid-template-columns: 340px 1fr; gap: 60px; }
     .job {
-      display: grid; grid-template-columns: 1fr auto; gap: 18px; padding: 26px 0;
-      border-top: 1px solid var(--line);
+      display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: center;
+      padding: 26px 0; width: 100%;
+      background: none; border: 0; border-top: 1px solid var(--line); text-align: left; cursor: pointer;
+      color: inherit; font: inherit;
     }
     .job:last-child { border-bottom: 1px solid var(--line); }
     .job h3 { font-size: 22px; margin-bottom: 6px; }
     .job p { color: var(--muted); margin: 0; }
+    .job-apply {
+      display: inline-flex; align-items: center; gap: 10px;
+    }
+    .job-apply .label {
+      font: 700 12px "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: .06em;
+    }
     .arrow {
       width: 42px; height: 42px; border: 1px solid var(--ink); border-radius: 50%;
       display: grid; place-items: center; transition: .2s;
@@ -372,6 +596,44 @@
     .modal {
       width: min(440px, 100%); background: var(--white); border-radius: 22px;
       padding: 34px 30px; box-shadow: var(--shadow); position: relative; animation: enter .3s ease;
+      max-height: calc(100vh - 40px); overflow-y: auto;
+    }
+    .modal.apply-modal { width: min(520px, 100%); }
+    .captcha-box {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 12px 14px; border-radius: 12px; background: var(--paper); border: 1px solid var(--line);
+      margin-bottom: 14px;
+    }
+    .captcha-box strong {
+      font: 700 18px "IBM Plex Mono", monospace; letter-spacing: .04em;
+    }
+    .captcha-refresh {
+      border: 0; background: transparent; color: var(--teal); font: 600 12px "IBM Plex Mono", monospace;
+      cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+    }
+    .auth-divider {
+      display: flex; align-items: center; gap: 12px; margin: 18px 0 14px;
+      color: var(--muted); font: 500 11px "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: .08em;
+    }
+    .auth-divider::before, .auth-divider::after {
+      content: ""; flex: 1; height: 1px; background: var(--line);
+    }
+    .social-auth { display: grid; gap: 10px; }
+    .social-btn {
+      width: 100%; min-height: 48px; border-radius: 12px; border: 1px solid var(--line);
+      background: var(--white); color: var(--ink); font-weight: 700; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      transition: .2s;
+    }
+    .social-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(7,20,16,.08); }
+    .social-btn:disabled {
+      opacity: .45; cursor: not-allowed; transform: none; box-shadow: none;
+    }
+    .social-btn .brand-icon {
+      width: 18px; height: 18px; display: grid; place-items: center; font-size: 14px; font-weight: 800;
+    }
+    .social-hint {
+      margin: 8px 0 0; font-size: 12px; color: var(--muted); text-align: center; line-height: 1.45;
     }
     .modal h2 { font-size: 32px; margin-bottom: 8px; }
     .modal .sub { color: var(--muted); margin-bottom: 24px; font-size: 14px; line-height: 1.5; }
@@ -400,38 +662,189 @@
 
     .disclaimer { font-size: 11px; line-height: 1.65; color: var(--muted); padding: 20px 0 0; }
 
-    @media (max-width: 980px) {
-      .shell { width: min(100% - 28px, 1240px); }
-      .nav-links {
-        position: fixed; left: 0; right: 0; top: 72px; background: var(--paper);
-        padding: 22px; flex-direction: column; align-items: start;
-        transform: translateY(-160%); transition: .3s; border-bottom: 1px solid var(--line);
-      }
-      .nav-links.open { transform: none; }
-      .menu { display: block; }
-      .nav-auth .button.ghost { display: none; }
-      .hero-stats { display: none; }
-      .hero-copy { padding: 100px 24px 70px; max-width: none; }
-      .split-2, .products, .band-grid, .tools-grid, .protect, .news-grid,
-      .learn-strip, .company-story, .values, .markets-layout, .jobs, .footer-grid {
-        grid-template-columns: 1fr;
-      }
-      .protect, .learn-strip, .products { grid-template-columns: 1fr 1fr; }
-      .section-head { display: block; }
-      .section-head p { margin-top: 14px; }
-      .watch-card { position: static; }
-      .cta-band .shell { display: block; }
-      .cta-band .button { margin-top: 22px; }
+    .nav-mobile-auth { display: none; }
+
+    @media (max-width: 1200px) {
+      .nav-links { gap: 18px; font-size: 13px; }
+      .hero-stats { width: min(280px, 34vw); }
+      .hero-stat strong { font-size: 22px; }
+      .footer-grid { grid-template-columns: 1.2fr repeat(2, 1fr); gap: 28px; }
     }
-    @media (max-width: 560px) {
-      h1 { font-size: 44px; }
-      .section { padding: 72px 0; }
-      .protect, .learn-strip, .products { grid-template-columns: 1fr; }
-      .market-head, .market-row { grid-template-columns: 1.2fr .8fr .7fr; }
-      .market-row .spark, .market-head > :last-child { display: none; }
-      .asset-row { grid-template-columns: 1fr auto; }
-      .asset-row > :nth-child(2) { display: none; }
+
+    @media (max-width: 1100px) {
+      .shell { width: min(100% - 32px, 1240px); }
+      nav { gap: 12px; }
+      .nav-links {
+        position: fixed; left: 0; right: 0; top: 72px; z-index: 45;
+        background: rgba(243, 246, 244, .98); backdrop-filter: blur(16px);
+        padding: 18px 20px 24px; flex-direction: column; align-items: stretch; gap: 0;
+        max-height: calc(100vh - 72px); overflow-y: auto;
+        border-bottom: 1px solid var(--line);
+        transform: translateY(-120%); opacity: 0; pointer-events: none;
+        transition: .28s ease; visibility: hidden;
+      }
+      .nav-links.open {
+        transform: none; opacity: 1; pointer-events: auto; visibility: visible;
+      }
+      .nav-links a {
+        padding: 14px 8px; border-bottom: 1px solid var(--line); opacity: 1;
+      }
+      .nav-links a.active::after { display: none; }
+      .nav-links a.active { color: var(--mint-deep); }
+      .nav-mobile-auth {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 16px;
+      }
+      .nav-auth .button.ghost,
+      .nav-auth .button.mint { display: none; }
+      .menu { display: block; }
+      .user-chip span:last-child { max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+      .hero {
+        min-height: clamp(560px, 78vh, 720px);
+        justify-content: flex-start;
+      }
+      .hero-copy {
+        width: min(100% - 48px, 1240px);
+        margin-left: 24px;
+        margin-right: 24px;
+        padding: 72px 0 24px;
+      }
+      .hero h1 { font-size: clamp(32px, 7vw, 44px); }
+      .hero-stats {
+        position: relative; right: auto; top: auto; transform: none;
+        width: auto; max-width: none;
+        margin: 0 24px 40px;
+        padding: 0; z-index: 2;
+        grid-template-columns: 1fr 1fr;
+      }
+      .hero-visual::after {
+        background:
+          linear-gradient(180deg, rgba(7,20,16,.55) 0%, rgba(7,20,16,.72) 45%, rgba(7,20,16,.88) 100%);
+      }
+
+      .split-2,
+      .band-grid,
+      .tools-grid,
+      .company-story,
+      .markets-layout,
+      .jobs,
+      .predict-features,
+      .futures-perks { grid-template-columns: 1fr; }
+      .trade-split,
+      .gold-grid { grid-template-columns: 1fr; }
+      .trade-split.reverse { direction: ltr; }
+
+      .products { grid-template-columns: repeat(3, 1fr); }
+      .protect { grid-template-columns: 1fr 1fr; }
+      .news-grid { grid-template-columns: 1fr 1fr; }
+      .learn-strip { grid-template-columns: 1fr 1fr; }
+      .values { grid-template-columns: 1fr; }
       .footer-grid { grid-template-columns: 1fr 1fr; }
+
+      .section-head { display: block; }
+      .section-head p { margin-top: 14px; max-width: none; }
+      .watch-card { position: static; }
+      .company-story { min-height: 0; }
+      .company-story img { min-height: 280px; max-height: 420px; }
+      .tool-feature { min-height: 320px; }
+      .cta-band { padding: 80px 0; }
+      .cta-band .shell { display: flex; flex-direction: column; align-items: flex-start; }
+      .cta-band .button { margin-top: 8px; }
+      .career-hero { min-height: 560px; }
+      .jobs { gap: 28px; }
+      .band { padding: 72px 0; }
+      .page-hero { padding: 64px 0 40px; }
+      .page-hero.predict-hero,
+      .page-hero.trade-hero { padding: 88px 0 64px; min-height: clamp(380px, 48vh, 520px); }
+      .markets-layout { padding: 32px 0 72px; }
+    }
+
+    @media (max-width: 900px) {
+      .products { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .shell { width: min(100% - 28px, 1240px); }
+      .section { padding: 72px 0; }
+      h1 { font-size: clamp(36px, 10vw, 52px); line-height: 1.02; }
+      h2 { font-size: clamp(28px, 7vw, 42px); line-height: 1.05; }
+      .news-grid,
+      .protect,
+      .learn-strip { grid-template-columns: 1fr; }
+
+      .panel-pad { padding: 22px; }
+      .chart-top { flex-direction: column; align-items: stretch; }
+      .chart-price { font-size: 34px; }
+      .range { width: fit-content; flex-wrap: wrap; }
+      .chart-wrap { height: 200px; }
+      .asset-row { padding: 16px 18px; grid-template-columns: 1.4fr .8fr; }
+      .asset-row > :nth-child(2) { display: none; }
+
+      .hero-copy { margin-left: 20px; margin-right: 20px; padding: 64px 0 20px; }
+      .hero-stats { margin: 0 20px 36px; grid-template-columns: 1fr; }
+      .hero-actions { width: 100%; }
+      .hero-actions .button { flex: 1 1 100%; }
+      .hero-stat strong { font-size: 26px; }
+
+      .ticker-item { padding: 14px 18px; font-size: 12px; }
+      .product { min-height: 0; padding: 28px 22px; }
+      .tool-feature { padding: 28px 22px; min-height: 280px; }
+      .tool-feature h3 { font-size: 26px; max-width: none; }
+      .tool-feature p { max-width: none; }
+      .tool-card { padding: 22px; }
+      .news-card { min-height: 0; }
+      .compare th, .compare td { padding: 14px 14px; font-size: 13px; }
+      .market-head, .market-row {
+        grid-template-columns: 1.4fr .7fr .7fr; padding: 14px 14px;
+      }
+      .market-row > :last-child,
+      .market-head > :last-child { display: none; }
+      .story-copy { padding: 48px 28px; }
+      .value { min-height: 0; }
+      .value h3 { margin-top: 28px; }
+      .career-hero { min-height: 480px; }
+      .career-content { padding-bottom: 48px; }
+      .career-content p { font-size: 16px; }
+      .job { gap: 12px; padding: 22px 0; }
+      .job h3 { font-size: 18px; }
+      .cta-band { padding: 64px 0; }
+      .cta-band h2 { font-size: clamp(28px, 8vw, 40px); }
+      .modal { padding: 28px 22px; border-radius: 18px; }
+      .modal h2 { font-size: 26px; }
+      .toast { left: 16px; right: 16px; bottom: 16px; max-width: none; }
+      .footer-grid { gap: 24px; padding-bottom: 40px; }
+      .band-grid { gap: 28px; }
+      .earn-row { gap: 12px; flex-wrap: wrap; }
+      .page-hero p { font-size: 16px; }
+    }
+
+    @media (max-width: 480px) {
+      .shell { width: min(100% - 24px, 1240px); }
+      .brand { font-size: 18px; gap: 8px; }
+      .brand-mark { width: 24px; height: 24px; border-radius: 6px; }
+      .button.small { min-height: 36px; padding: 0 12px; font-size: 13px; }
+      .section { padding: 56px 0; }
+      .panel-pad { padding: 18px; }
+      .chart-price { font-size: 28px; }
+      .chart-note { flex-direction: column; gap: 6px; }
+      .asset-row { grid-template-columns: 1fr auto; }
+      .coin-dot { width: 30px; height: 30px; font-size: 10px; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .nav-mobile-auth { grid-template-columns: 1fr; }
+      .company-story img { min-height: 220px; max-height: 300px; }
+      .hero-copy h1 { word-break: break-word; }
+      .user-chip { padding: 6px 8px; gap: 6px; font-size: 12px; }
+      .user-chip span:last-child { display: none; }
+      .market-head, .market-row { grid-template-columns: 1fr auto auto; font-size: 13px; }
+      .predict-yes, .predict-no { min-width: 58px; min-height: 32px; font-size: 12px; }
+      .predict-tags { gap: 6px; }
+      .predict-tag { padding: 7px 11px; font-size: 11px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .page, .modal, .line, .ticker-track, .pulse { animation: none !important; }
+      .ticker-track { transform: none; }
     }
   </style>
 </head>
@@ -441,12 +854,14 @@
       <a class="brand" href="#home" aria-label="Metadeel home"><img class="brand-mark" src="favicon.png" alt="Metadeel">Metadeel</a>
       <div class="nav-links" id="navLinks">
         <a href="#home">Home</a>
-        <a href="#markets">Markets</a>
+        <a href="#predict">Predict</a>
         <a href="#trade">Trade</a>
-        <a href="#earn">Earn</a>
         <a href="#insights">Insights</a>
-        <a href="#company">Company</a>
         <a href="#careers">Careers</a>
+        <div class="nav-mobile-auth">
+          <button type="button" class="button ghost" data-open-auth="login">Log in</button>
+          <button type="button" class="button mint" data-open-auth="signup">Sign up</button>
+        </div>
       </div>
       <div class="nav-auth">
         <div class="user-chip" id="userChip">
@@ -456,21 +871,23 @@
         <button type="button" class="button ghost small" id="loginBtn">Log in</button>
         <button type="button" class="button mint small" id="signupBtn">Sign up</button>
         <button type="button" class="button small" id="logoutBtn" style="display:none">Log out</button>
-        <button class="menu" id="menu" aria-label="Open menu">☰</button>
+        <button class="menu" id="menu" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">☰</button>
       </div>
     </nav>
   </header>
 
   <main class="page" data-page="home">
     <section class="hero">
-      <div class="hero-visual" aria-hidden="true"></div>
+      <div class="hero-visual" aria-hidden="true">
+        <video id="heroVisualVideo" class="hero-visual-video" aria-label="company-visual" data-testid="hero-video" autoplay muted loop playsinline preload="auto"></video>
+      </div>
       <div class="hero-copy">
         <span class="eyebrow">Crypto finance, refined</span>
-        <h1>Trade digital assets with clarity.</h1>
+        <h1>Trade crypto with clarity.</h1>
         <p>Buy, sell, and earn crypto in one place. Metadeel brings live market data, staking yield, and institutional-grade tools into a calmer experience.</p>
         <div class="hero-actions">
           <button type="button" class="button mint" id="heroSignup">Get started</button>
-          <a class="button ghost-light" href="#markets">View live markets</a>
+          <a class="button ghost-light" href="#predict">View Predict markets</a>
         </div>
       </div>
       <div class="hero-stats">
@@ -530,7 +947,7 @@
           <div class="panel">
             <div style="padding:22px 28px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
               <strong>Top assets</strong>
-              <a href="#markets" class="mono" style="font-size:12px;color:var(--teal)">FULL LIST →</a>
+              <a href="#predict" class="mono" style="font-size:12px;color:var(--teal)">PREDICT →</a>
             </div>
             <div class="asset-list" id="topAssets"></div>
           </div>
@@ -552,13 +969,13 @@
             <div class="product-icon">↗</div>
             <h3>Spot trading</h3>
             <p>Buy and sell BTC, ETH, SOL, XRP, and dozens of assets with a clean order ticket and live depth cues.</p>
-            <a href="#markets">Explore markets →</a>
+            <a href="#predict">Explore Predict →</a>
           </article>
           <article class="product">
             <div class="product-icon">◎</div>
             <h3>Earn & staking</h3>
             <p>Put idle crypto to work with flexible and bonded staking, similar to yield programs offered across leading exchanges.</p>
-            <a href="#earn">See earn rates →</a>
+            <a href="#home">See earn rates →</a>
           </article>
           <article class="product">
             <div class="product-icon">▣</div>
@@ -600,6 +1017,7 @@
         </div>
         <div class="tools-grid">
           <div class="tool-feature">
+            <video id="toolFeatureVideo" class="tool-feature-video" aria-label="Strategies" data-testid="strategies-video" autoplay muted loop playsinline preload="auto"></video>
             <span class="eyebrow" style="color:var(--mint)">Metadeel Legend</span>
             <h3>Charts, depth, and orders in one workspace.</h3>
             <p>A desktop-grade desk for spot markets, inspired by pro crypto terminals while staying readable on day one.</p>
@@ -738,45 +1156,258 @@
     </section>
   </main>
 
-  <main class="page" data-page="markets">
-    <section class="page-hero shell">
-      <span class="eyebrow">Markets</span>
-      <h1>Live crypto prices.</h1>
-      <p>Spot USD prices and 24-hour changes from CoinGecko. Data refreshes when you load the page. Not investment advice.</p>
+  <main class="page" data-page="predict">
+    <section class="page-hero predict-hero">
+      <video id="predictHeroVideo" class="predict-hero-video" aria-label="Supercharge your next move" data-testid="predict-hero-video" autoplay muted loop playsinline preload="auto"></video>
+      <div class="shell">
+        <span class="eyebrow">Metadeel Predict</span>
+        <h1>Trade what happens next.</h1>
+        <p>Binary Yes / No event contracts on crypto, economics, sports, and culture. Prices move with the crowd, settle at $1 if you are right, or $0 if you are wrong.</p>
+        <div class="predict-tags" id="predictTags">
+          <button type="button" class="predict-tag active" data-filter="all">All</button>
+          <button type="button" class="predict-tag" data-filter="Crypto">Crypto</button>
+          <button type="button" class="predict-tag" data-filter="Economics">Economics</button>
+          <button type="button" class="predict-tag" data-filter="Sports">Sports</button>
+          <button type="button" class="predict-tag" data-filter="Politics">Politics</button>
+          <button type="button" class="predict-tag" data-filter="Culture">Culture</button>
+        </div>
+      </div>
     </section>
     <section class="shell markets-layout">
       <div class="market-table">
-        <div class="market-head"><span>Asset</span><span>Price</span><span>24h</span><span>Shape</span></div>
+        <div class="market-head"><span>Event</span><span>Yes</span><span>No</span><span>Volume</span></div>
         <div id="marketTable"></div>
       </div>
       <aside class="panel watch-card">
-        <span class="eyebrow">Calendar</span>
-        <h3 style="font-size:26px;margin:18px 0 8px">On the radar</h3>
+        <span class="eyebrow">How Predict works</span>
+        <h3 style="font-size:26px;margin:18px 0 8px">Simple odds, clear payout</h3>
         <div id="events"></div>
+        <p class="disclaimer" style="padding-top:12px">Illustrative demo contracts only. Event contracts involve risk of loss and are not available in all regions.</p>
       </aside>
+    </section>
+    <section class="shell predict-features">
+      <article class="product">
+        <div class="product-icon">Y/N</div>
+        <h3>Binary contracts</h3>
+        <p>Buy Yes or No on an outcome. Correct contracts settle at $1. Incorrect contracts settle at $0.</p>
+      </article>
+      <article class="product">
+        <div class="product-icon">⇄</div>
+        <h3>Exit early</h3>
+        <p>Sell before the event ends at the live market price to lock a gain or cut a loss.</p>
+      </article>
+      <article class="product">
+        <div class="product-icon">▣</div>
+        <h3>Limit orders</h3>
+        <p>Place dollar or contract limits with IOC or longer-dated GTD style behavior in the full product.</p>
+      </article>
     </section>
   </main>
 
   <main class="page" data-page="trade">
-    <section class="page-hero shell">
-      <span class="eyebrow">Trade</span>
-      <h1>All in one crypto desk.</h1>
-      <p>Spot markets, recurring buys, and charting in a single workspace. Sign up to save watchlists and paper-trade flows in this demo.</p>
-      <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap">
-        <button type="button" class="button mint" data-open-auth="signup">Create account</button>
-        <a class="button ghost" href="#markets">Browse assets</a>
+    <section class="page-hero trade-hero">
+      <video id="tradeHeroVideo" class="trade-hero-video" aria-label="See how the markets are moving. Day or night." data-testid="trade-hero-video" autoplay muted loop playsinline preload="auto">
+        <source src="https://videos.ctfassets.net/ilblxxee70tt/3oVPID0mhydPZjMlfI2jaV/f434aef9538c97cd079b700053aa68a3/Robinhood_Bats_SH04_JetEnginePre_3240x2025_1__1_.webm" type="video/webm">
+      </video>
+      <div class="shell">
+        <span class="eyebrow">Trade</span>
+        <h1>Advanced trading tools, now on desktop and mobile.</h1>
+        <p>Charts powered by Metadeel Legend are available across desktop and mobile, so you can build a strategy and manage risk wherever you are.</p>
+        <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap">
+          <button type="button" class="button mint" data-open-auth="signup">Get started</button>
+          <a class="button ghost" href="#predict">Open Predict</a>
+        </div>
       </div>
     </section>
-    <section class="section shell">
-      <div class="products">
-        <article class="product"><div class="product-icon">₿</div><h3>Instant buy</h3><p>Purchase crypto with as little as $1 of purchasing power once funding is connected.</p></article>
-        <article class="product"><div class="product-icon">⇄</div><h3>Convert</h3><p>Swap between major pairs without leaving your portfolio view.</p></article>
-        <article class="product"><div class="product-icon">⏱</div><h3>Recurring</h3><p>Automate dollar-cost averaging across BTC, ETH, and SOL.</p></article>
+
+    <section class="section shell" style="padding-top:48px;padding-bottom:24px">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Asset desk</span>
+          <h2>Your favorite assets. One place.</h2>
+        </div>
+        <p>Switch between options, crypto, futures, and stocks without leaving the Metadeel trade workspace.</p>
       </div>
+      <div class="asset-tabs" id="assetTabs">
+        <button type="button" class="asset-tab active" data-asset="options">Options</button>
+        <button type="button" class="asset-tab" data-asset="crypto">Crypto</button>
+        <button type="button" class="asset-tab" data-asset="futures">Futures</button>
+        <button type="button" class="asset-tab" data-asset="stocks">Stocks</button>
+      </div>
+      <div class="asset-panel active" data-asset-panel="options">
+        <div class="trade-split" style="border:0;padding:24px 0 0">
+          <div>
+            <h3 style="font-size:28px;margin-bottom:12px">Upgrade your options</h3>
+            <p>Level up options trading with thoughtfully designed tools like simulated returns, a strategy builder for single- or multi-leg trades, and a streamlined options chain.</p>
+            <div class="actions">
+              <button type="button" class="button" data-open-auth="signup">Upgrade your options</button>
+            </div>
+            <a class="link-quiet" href="#home">Disclosures</a>
+            <p class="disclaimer">On stock and ETF options, index options may carry a contract fee. Other fees may apply. Options are risky and are not suitable for all investors.</p>
+          </div>
+          <div class="trade-media illo">
+            <picture>
+              <source srcset="https://images.ctfassets.net/ilblxxee70tt/kLDGbtU7McSCOPcXRMawF/afe62e0f4f46087a2573eb45d66f82a5/web_illo_options_builder.svg">
+              <img alt="Strategy Builder" src="https://images.ctfassets.net/ilblxxee70tt/kLDGbtU7McSCOPcXRMawF/afe62e0f4f46087a2573eb45d66f82a5/web_illo_options_builder.svg">
+            </picture>
+          </div>
+        </div>
+      </div>
+      <div class="asset-panel" data-asset-panel="crypto">
+        <div class="trade-split" style="border:0;padding:24px 0 0">
+          <div>
+            <h3 style="font-size:28px;margin-bottom:12px">Trade crypto day or night</h3>
+            <p>Buy, sell, and convert BTC, ETH, SOL, and more with as little as $1. Spot tickets, recurring buys, and depth cues stay in one calm desk.</p>
+            <div class="actions">
+              <a class="button" href="#home">Open crypto desk</a>
+            </div>
+            <p class="disclaimer">Crypto trading involves substantial risk of loss and is not available in all regions. Cryptocurrency is not FDIC or SIPC protected.</p>
+          </div>
+          <div class="trade-media">
+            <img src="https://images.unsplash.com/photo-1518546305927-5a555bb7020d?auto=format&fit=crop&w=1200&q=80" alt="Crypto trading visual">
+          </div>
+        </div>
+      </div>
+      <div class="asset-panel" data-asset-panel="futures">
+        <div class="trade-split" style="border:0;padding:24px 0 0">
+          <div>
+            <h3 style="font-size:28px;margin-bottom:12px">Futures with clearer controls</h3>
+            <p>Express directional views with listed futures contracts, ladder-friendly tickets, and risk labels that stay visible before you send an order.</p>
+            <div class="actions">
+              <button type="button" class="button" data-open-auth="signup">Explore futures</button>
+            </div>
+            <p class="disclaimer">Futures trading is speculative and can involve losses that exceed deposits. Demo content only.</p>
+          </div>
+          <div class="trade-media dark-panel">
+            <span class="eyebrow" style="color:var(--mint)">Contract desk</span>
+            <h3>Fast tickets. Precise sizing.</h3>
+            <p>Built for traders who want speed without burying the risk disclosures.</p>
+          </div>
+        </div>
+      </div>
+      <div class="asset-panel" data-asset-panel="stocks">
+        <div class="trade-split" style="border:0;padding:24px 0 0">
+          <div>
+            <h3 style="font-size:28px;margin-bottom:12px">Stocks and ETFs, extended hours</h3>
+            <p>Trade hundreds of popular stocks and ETFs. See how markets are moving day or night with extended-session access on selected names.</p>
+            <div class="actions">
+              <button type="button" class="button mint" data-open-auth="signup">Get started</button>
+            </div>
+            <a class="link-quiet" href="#home">Limitations and risks apply</a>
+            <p class="disclaimer">Commission-free stock and ETF trading may still include regulatory or other fees. Extended hours involve additional risk.</p>
+          </div>
+          <div class="trade-media">
+            <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1200&q=80" alt="Stock market chart">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="trade-band">
+      <div class="shell">
+        <span class="eyebrow">Extended access</span>
+        <h2>See how markets are moving. Day or night.</h2>
+        <p>Trade hundreds of popular stocks and ETFs around the clock on supported sessions. Commission-free equity tickets, with other fees disclosed up front.</p>
+        <div class="actions">
+          <button type="button" class="button mint" data-open-auth="signup">Get started</button>
+          <a class="button ghost-light" href="#home">Limitations and risks apply</a>
+        </div>
+        <p class="disclaimer" style="color:rgba(255,255,255,.42)">Stocks and ETFs offered as a concept experience through Metadeel. Other fees may apply. See disclosures for more details.</p>
+      </div>
+    </section>
+
+    <section class="shell trade-split">
+      <div>
+        <span class="eyebrow">Margin</span>
+        <h2>Access competitive margin rates.</h2>
+        <p>Borrow against eligible holdings with transparent rate tiers designed for active traders who want more buying power without hidden fine print.</p>
+        <div class="actions">
+          <button type="button" class="button" data-open-auth="signup">Lower your margin rate</button>
+        </div>
+        <a class="link-quiet" href="#home">Disclosures</a>
+      </div>
+      <div class="trade-media illo">
+        <picture>
+          <source srcset="https://images.ctfassets.net/ilblxxee70tt/1WEoSXnWW0ZXfxJl8HlGb3/816f45c02398eb4db293431b8baed417/Option_PDT_Web_1x.svg">
+          <img alt="Cash Accounts" src="https://images.ctfassets.net/ilblxxee70tt/1WEoSXnWW0ZXfxJl8HlGb3/816f45c02398eb4db293431b8baed417/Option_PDT_Web_1x.svg">
+        </picture>
+      </div>
+    </section>
+
+    <section class="shell trade-split reverse">
+      <div>
+        <span class="eyebrow">Ladder</span>
+        <h2>Fast. Precise. Ladder trading.</h2>
+        <p>Place equities, crypto, and futures trades faster with a mobile-first ladder that moves with you. Built for clarity, precision, and control.</p>
+        <div class="actions">
+          <button type="button" class="button mint" data-open-auth="signup">Try ladder trading</button>
+        </div>
+        <a class="link-quiet" href="#home">Disclosures</a>
+      </div>
+      <div class="trade-media has-video">
+        <video id="ladderTradeVideo" class="trade-media-video" aria-label="Fast. Precise. Ladder trading." data-testid="ladder-video" autoplay muted loop playsinline preload="auto"></video>
+      </div>
+    </section>
+
+    <section class="section shell" style="padding-top:40px">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Metadeel Gold</span>
+          <h2>Level up with Gold.</h2>
+        </div>
+        <p>Your money can work harder with elevated cash yield, bigger instant deposits, and smarter market context. First 30 days free in this demo concept, then a sample $5/month membership.</p>
+      </div>
+      <div class="gold-grid">
+        <div class="gold-card">
+          <div class="gold-card-bg" aria-hidden="true">
+            <picture>
+              <source media="(max-width: 425px)" srcset="https://images.ctfassets.net/ilblxxee70tt/p4bBb9PI0a3IbvY32m782/5d94f2c8b1a377306a21557a2a0a6e36/container-mobile-8.jpg">
+              <source srcset="https://images.ctfassets.net/ilblxxee70tt/4m0RuhoShCo1RQmCGiiPdM/78485cc9618e27c6694fd55e7a65046a/container-desktop-8.jpg">
+              <img alt="Put your crypto to work" src="https://images.ctfassets.net/ilblxxee70tt/4m0RuhoShCo1RQmCGiiPdM/78485cc9618e27c6694fd55e7a65046a/container-desktop-8.jpg">
+            </picture>
+          </div>
+          <span class="eyebrow" style="color:var(--mint)">Membership</span>
+          <h2>Start earning with Gold</h2>
+          <p>High-yield cash on eligible balances, priority tools, and Cortex-style insights that turn market data into next-move context.</p>
+          <div style="margin-top:24px">
+            <button type="button" class="button mint" data-open-auth="signup">Start earning with Gold</button>
+          </div>
+          <a class="link-quiet" href="#home" style="color:var(--mint)">Terms and disclosures</a>
+        </div>
+        <div class="gold-perks">
+          <article class="gold-perk">
+            <span class="mono">03.35% APY</span>
+            <h3>High-yield cash</h3>
+            <p>Earn more interest on eligible brokerage cash. No illustrative cap, and you can invest or withdraw anytime.*</p>
+          </article>
+          <article class="gold-perk">
+            <span class="mono">INSTANT DEPOSITS</span>
+            <h3>Bigger Instant Deposits</h3>
+            <p>Trade sooner with deposits up to 3× your portfolio value on eligible accounts.</p>
+          </article>
+          <article class="gold-perk">
+            <span class="mono">MARGIN BOOST</span>
+            <h3>First $1k of margin interest-free</h3>
+            <p>Then enjoy sample margin rates between 3.95% and 5%.**</p>
+          </article>
+          <article class="gold-perk">
+            <span class="mono">CORTEX</span>
+            <h3>Intelligence built to help you act</h3>
+            <p>Metadeel Cortex turns market data into insights so you can decide your next move.</p>
+          </article>
+        </div>
+      </div>
+      <p class="disclaimer">*Terms apply. Rate subject to change. **For margin-enabled customers. If you carry a margin balance, cash may not earn yield. Cortex features use generative AI for informational purposes only and are not research or a recommendation. Metadeel Gold is a concept membership for this demo.</p>
+    </section>
+
+    <section class="shell trade-cta">
+      <span class="eyebrow">Ready when you are</span>
+      <h2>Take your trading to the next level.</h2>
+      <button type="button" class="button mint" data-open-auth="signup">Get started</button>
     </section>
   </main>
 
-  <main class="page" data-page="earn">
+  <main class="page" data-page="earn" hidden>
     <section class="page-hero shell">
       <span class="eyebrow">Earn</span>
       <h1>Yield with clear labels.</h1>
@@ -794,18 +1425,116 @@
     </section>
   </main>
 
-  <main class="page editorial" data-page="insights">
+  <main class="page" data-page="insights">
     <section class="page-hero shell">
-      <span class="eyebrow">Insights</span>
-      <h1 style="color:white">The crypto desk brief.</h1>
-      <p style="color:rgba(255,255,255,.58)">Company and product themes from across the digital-asset industry. Cards link to public company pages where available.</p>
+      <span class="eyebrow">Insights · Futures</span>
+      <h1>More insight. More speed.</h1>
+      <p>Smarter futures tools. Get clearer insight into the market with L2 futures data at no extra cost, precise charting, and commissions built to keep more in your pocket.</p>
+      <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap">
+        <a class="button mint" href="#futures-contracts">Learn more</a>
+        <button type="button" class="button ghost" data-open-auth="signup">Get started</button>
+      </div>
+      <p class="disclaimer">Please note that device linking is not currently available and will be coming in the near future.</p>
     </section>
-    <section class="section shell"><div class="news-grid" id="allNews"></div>
-      <p class="disclaimer" style="color:rgba(255,255,255,.45)">News cards are editorial demonstrations based on public crypto-finance themes. Connect a licensed news feed for production use.</p>
+
+    <section class="trade-band">
+      <div class="shell">
+        <span class="eyebrow">Futures desk</span>
+        <h2>Trade the S&P 500, oil, Bitcoin, and more.</h2>
+        <p>No greeks. No time decay. Express a view on indexes, energy, metals, currencies, and crypto with listed futures contracts.</p>
+        <div class="actions">
+          <button type="button" class="button mint" data-open-auth="signup">Open futures</button>
+          <a class="button ghost-light" href="#home">Disclosures</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section shell">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">The Metadeel difference</span>
+          <h2>Built for clearer futures trading.</h2>
+        </div>
+        <p>Lower illustrative commissions, special tax treatment context, and nearly around-the-clock access help you stay ready when news breaks.</p>
+      </div>
+      <div class="futures-perks">
+        <article class="futures-perk">
+          <span class="mono">COMMISSIONS</span>
+          <h3>Enjoy low commissions</h3>
+          <p>Access some of the lowest commissions in the market along with free, real-time market data.*</p>
+          <p class="disclaimer">*Comparison is to fixed price commissions. Exchange, NFA, and subscription fees may apply in addition to illustrative commission rates.</p>
+        </article>
+        <article class="futures-perk">
+          <span class="mono">TAX CONTEXT</span>
+          <h3>Gain access to special tax treatment</h3>
+          <p>Take advantage of futures’ 60/40 tax rule with 60% of gains taxed as long-term capital gains.*</p>
+          <p class="disclaimer">*Conditions apply. Not tax advice.</p>
+        </article>
+        <article class="futures-perk">
+          <span class="mono">ACCESS</span>
+          <h3>Trade nearly 24 hours a day</h3>
+          <p>Trade the news as it breaks with futures’ nearly 24-hour trading window on supported contracts.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="shell trade-split">
+      <div>
+        <span class="eyebrow">Education</span>
+        <h2>The fundamentals of futures.</h2>
+        <p>Grow your trading skills and knowledge with in-depth futures education from Metadeel Learn, covering contract specs, margin, settlement, and risk.</p>
+        <div class="actions">
+          <a class="button" href="#home">Learn more</a>
+        </div>
+      </div>
+      <div class="trade-media dark-panel">
+        <span class="eyebrow" style="color:var(--mint)">Metadeel Learn</span>
+        <h3>From tick size to trading hours</h3>
+        <p>Short lessons that explain multipliers, settlement, and how micro contracts change position sizing.</p>
+      </div>
+    </section>
+
+    <section class="section shell" id="futures-contracts">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Choose your future</span>
+          <h2>Stock index contracts and more.</h2>
+        </div>
+        <p>Browse illustrative product codes across stock index, energy, currency, metals, and crypto futures.</p>
+      </div>
+      <div class="futures-cats" id="futuresCats">
+        <button type="button" class="futures-cat active" data-fcat="Stock Index">Stock Index</button>
+        <button type="button" class="futures-cat" data-fcat="Energy">Energy</button>
+        <button type="button" class="futures-cat" data-fcat="Currency">Currency</button>
+        <button type="button" class="futures-cat" data-fcat="Metals">Metals</button>
+        <button type="button" class="futures-cat" data-fcat="Crypto">Crypto</button>
+      </div>
+      <div class="futures-table-wrap">
+        <table class="futures-table">
+          <thead>
+            <tr>
+              <th>Product Code</th>
+              <th>Product</th>
+              <th>Multiplier</th>
+              <th>Min Tick Size</th>
+              <th>Settlement</th>
+              <th>Trading Hrs (ET)</th>
+            </tr>
+          </thead>
+          <tbody id="futuresTableBody"></tbody>
+        </table>
+      </div>
+      <div class="futures-note">Illustrative contract specs for demo only. Hours, multipliers, and tick values can change. Futures involve substantial risk of loss and are not suitable for all investors.</div>
+    </section>
+
+    <section class="shell trade-cta">
+      <span class="eyebrow">Ready when you are</span>
+      <h2>Futures are one tap away.</h2>
+      <button type="button" class="button mint" data-open-auth="signup">Get started</button>
     </section>
   </main>
 
-  <main class="page" data-page="company">
+  <main class="page" data-page="company" hidden>
     <section class="company-story">
       <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1600&q=85" alt="Analytics dashboard on a desk">
       <div class="story-copy">
@@ -847,6 +1576,10 @@
   </main>
 
   <section class="cta-band">
+    <video class="cta-band-video" aria-label="Join a new generation of crypto investors" data-testid="cta-video" autoplay muted loop playsinline preload="auto">
+      <source src="https://videos.ctfassets.net/ilblxxee70tt/3r1UZhjsj4AexVmCH9hrfH/1e7b93b16249b7ef73025a31d4cfae38/Dotcom_NewGeneration_Animation_WEB.webm" type="video/webm">
+      <img alt="Join a new generation of crypto investors" src="https://images.ctfassets.net/ilblxxee70tt/6WBms0BL77uZhazKdaye91/981a21240eef31028f4e760ae6fa9886/Investors_Hero.jpg">
+    </video>
     <div class="shell">
       <h2>Join a new generation of crypto investors.</h2>
       <button type="button" class="button" data-open-auth="signup" style="background:white;color:var(--ink);border-color:white">Sign up free</button>
@@ -863,8 +1596,7 @@
         <div>
           <h4>Products</h4>
           <a href="#trade">Trade</a>
-          <a href="#earn">Earn</a>
-          <a href="#markets">Markets</a>
+          <a href="#predict">Predict</a>
           <a href="#trade">Legend</a>
           <a href="#home">Wallet</a>
           <a href="#home">API</a>
@@ -873,22 +1605,21 @@
           <h4>Learn</h4>
           <a href="#insights">Insights</a>
           <a href="#home">Metadeel Learn</a>
-          <a href="#company">Disclosures</a>
-          <a href="#company">Support</a>
+          <a href="#home">Disclosures</a>
+          <a href="#home">Support</a>
         </div>
         <div>
           <h4>Company</h4>
-          <a href="#company">About</a>
           <a href="#careers">Careers</a>
-          <a href="#company">Press</a>
-          <a href="#company">Partners</a>
+          <a href="#home">Press</a>
+          <a href="#home">Partners</a>
         </div>
         <div>
           <h4>Legal</h4>
-          <a href="#company">Terms</a>
-          <a href="#company">Privacy</a>
-          <a href="#company">Risk notice</a>
-          <a href="#company">Licenses</a>
+          <a href="#home">Terms</a>
+          <a href="#home">Privacy</a>
+          <a href="#home">Risk notice</a>
+          <a href="#home">Licenses</a>
         </div>
       </div>
       <div class="footer-bottom">
@@ -915,13 +1646,69 @@
           <label for="authPassword">Password</label>
           <input id="authPassword" name="password" type="password" autocomplete="current-password" required placeholder="At least 6 characters" minlength="6">
         </div>
+        <div class="field" id="signupCaptchaField" style="display:none">
+          <label for="authCaptcha">Captcha</label>
+          <div class="captcha-box">
+            <strong id="authCaptchaPrompt">7 + 3 = ?</strong>
+            <button type="button" class="captcha-refresh" id="authCaptchaRefresh">Refresh</button>
+          </div>
+          <input id="authCaptcha" name="captcha" type="text" inputmode="numeric" placeholder="Enter the answer to unlock signup">
+        </div>
         <div class="form-error" id="authError"></div>
         <button type="submit" class="button mint" id="authSubmit">Log in</button>
+        <div id="socialAuthBlock" style="display:none">
+          <div class="auth-divider">or continue with</div>
+          <div class="social-auth">
+            <button type="button" class="social-btn" id="signupGmail" disabled>
+              <span class="brand-icon">G</span> Sign up with Gmail
+            </button>
+            <button type="button" class="social-btn" id="signupApple" disabled>
+              <span class="brand-icon"></span> Sign up with Apple
+            </button>
+          </div>
+          <p class="social-hint" id="socialHint">Solve the captcha first to enable Gmail and Apple signup.</p>
+        </div>
       </form>
       <div class="form-switch">
         <span id="authSwitchText">New to Metadeel?</span>
         <button type="button" class="button text" id="authSwitch">Sign up</button>
       </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="applyModal" role="dialog" aria-modal="true" aria-labelledby="applyTitle">
+    <div class="modal apply-modal">
+      <button type="button" class="modal-close" id="applyClose" aria-label="Close">×</button>
+      <h2 id="applyTitle">Apply now</h2>
+      <p class="sub" id="applySub">Submit your application for this role. Demo form only.</p>
+      <form id="applyForm" novalidate>
+        <div class="field">
+          <label for="applyName">Full name</label>
+          <input id="applyName" name="name" type="text" autocomplete="name" required placeholder="Alex Chen">
+        </div>
+        <div class="field">
+          <label for="applyEmail">Email</label>
+          <input id="applyEmail" name="email" type="email" autocomplete="email" required placeholder="you@email.com">
+        </div>
+        <div class="field">
+          <label for="applyPhone">Phone</label>
+          <input id="applyPhone" name="phone" type="tel" autocomplete="tel" required placeholder="+1 555 0100">
+        </div>
+        <div class="field">
+          <label for="applyLinkedin">LinkedIn</label>
+          <input id="applyLinkedin" name="linkedin" type="url" autocomplete="url" required placeholder="https://linkedin.com/in/you">
+        </div>
+        <div class="field">
+          <label for="applyCaptcha">Captcha</label>
+          <div class="captcha-box">
+            <strong id="captchaPrompt">7 + 3 = ?</strong>
+            <button type="button" class="captcha-refresh" id="captchaRefresh">Refresh</button>
+          </div>
+          <input id="applyCaptcha" name="captcha" type="text" inputmode="numeric" required placeholder="Enter the answer">
+        </div>
+        <div class="form-error" id="applyError"></div>
+        <button type="submit" class="button mint" id="applySubmit">Submit application</button>
+      </form>
     </div>
   </div>
 
@@ -1005,40 +1792,114 @@
           <span class="mono ${(p.usd_24h_change || 0) >= 0 ? "up" : "down"}">${move}</span>
         </div>`;
       }).join("");
-
-      document.querySelector("#marketTable").innerHTML = COINS.map(c => {
-        const p = priceMap[c.id] || {};
-        const move = pct(p.usd_24h_change);
-        return `<div class="market-row">
-          <div><strong>${c.name}</strong><small class="mono">${c.symbol} · CRYPTO</small></div>
-          <strong class="mono">${money(p.usd || 0)}</strong>
-          <span class="mono ${(p.usd_24h_change || 0) >= 0 ? "up" : "down"}">${move}</span>
-          <svg class="spark" viewBox="0 0 100 34" preserveAspectRatio="none"><polyline points="${c.spark}"/></svg>
-        </div>`;
-      }).join("");
     }
+
+    const predictions = [
+      { cat: "Crypto", title: "Bitcoin above $70,000 by end of 2026?", meta: "BTC · Year-end close", yes: 0.42, no: 0.59, vol: "$12.4M" },
+      { cat: "Crypto", title: "Ethereum ETF weekly inflows stay positive?", meta: "ETH · This week", yes: 0.61, no: 0.40, vol: "$4.8M" },
+      { cat: "Economics", title: "Fed cuts rates at the next meeting?", meta: "FOMC · Policy", yes: 0.33, no: 0.68, vol: "$28.1M" },
+      { cat: "Economics", title: "US CPI prints below 3.0% next release?", meta: "Inflation · Monthly", yes: 0.47, no: 0.54, vol: "$9.6M" },
+      { cat: "Sports", title: "Championship favorite covers the spread?", meta: "Pro football · Game line", yes: 0.55, no: 0.46, vol: "$18.2M" },
+      { cat: "Sports", title: "Star forward scores anytime TD?", meta: "Player prop · Live", yes: 0.38, no: 0.63, vol: "$6.1M" },
+      { cat: "Politics", title: "Major bill clears the chamber this quarter?", meta: "Legislative · Q3", yes: 0.29, no: 0.72, vol: "$7.4M" },
+      { cat: "Culture", title: "Blockbuster opens above $100M weekend?", meta: "Box office · Opening", yes: 0.51, no: 0.50, vol: "$3.2M" },
+      { cat: "Crypto", title: "Solana flips BNB by market cap in 2026?", meta: "SOL · Ranking", yes: 0.22, no: 0.79, vol: "$5.5M" },
+      { cat: "Culture", title: "Awards show draws over 20M viewers?", meta: "TV · Live event", yes: 0.44, no: 0.57, vol: "$2.1M" }
+    ];
+
+    function cents(n) {
+      return "$" + Number(n).toFixed(2);
+    }
+
+    function renderPredictions(filter) {
+      const rows = predictions.filter(p => filter === "all" || p.cat === filter);
+      document.querySelector("#marketTable").innerHTML = rows.map(p =>
+        `<div class="market-row">
+          <div><strong>${p.title}</strong><small class="mono">${p.cat} · ${p.meta}</small></div>
+          <span class="predict-yes">${cents(p.yes)}</span>
+          <span class="predict-no">${cents(p.no)}</span>
+          <strong class="mono">${p.vol}</strong>
+        </div>`
+      ).join("") || `<div class="market-row"><div><strong>No contracts in this category yet.</strong><small class="mono">Try another filter</small></div></div>`;
+    }
+
+    renderPredictions("all");
+    document.querySelectorAll("#predictTags .predict-tag").forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll("#predictTags .predict-tag").forEach(x => x.classList.remove("active"));
+        btn.classList.add("active");
+        renderPredictions(btn.dataset.filter);
+      };
+    });
 
     const news = [
       { region: "Coinbase · Platform", title: "Retail crypto apps keep staking and recurring buys front and center", copy: "Beginner-friendly exchanges continue to pair simple buy flows with flexible staking and education rewards.", image: "photo-1621761191319-c6fb62004040", url: "https://www.coinbase.com/" },
       { region: "Kraken · Security", title: "Proof-of-reserves and bonded staking remain trust signals", copy: "Security-first venues emphasize transparency, MFA, and higher-yield bonded staking for long-term holders.", image: "photo-1563986768609-322da13575f3", url: "https://www.kraken.com/" },
-      { region: "Binance · Liquidity", title: "Deep books and earn products define high-volume desks", copy: "Global liquidity venues lean on spot depth, earn suites, and advanced order types for active traders.", image: "photo-1642790106117-e829e14bb061", url: "https://www.binance.com/" },
+      { region: "Binance · Liquidity", title: "Deep books and earn products define high-volume desks", copy: "Global liquidity venues lean on spot depth, earn suites, and advanced order types for active traders.", image: "photo-1518546305927-5a555bb7020d", url: "https://www.binance.com/" },
       { region: "Gemini · Custody", title: "Regulated custody and institutional controls stay in focus", copy: "US-regulated brokers highlight cold storage, compliance, and simplified earn products for cautious investors.", image: "photo-1553729784-377feff6f5b1", url: "https://www.gemini.com/" },
       { region: "Crypto.com · Cards", title: "Spend-and-earn loops keep expanding beyond the exchange", copy: "Card cashback, app-native earn, and mobile trading remain core to consumer crypto brands.", image: "photo-1556742049-0cfed4f6a45d", url: "https://crypto.com/" },
       { region: "Bitstamp · Markets", title: "Veteran exchanges stress reliability over feature sprawl", copy: "Long-running European venues still compete on trust, fiat rails, and selective asset listings.", image: "photo-1611974789855-9c2a0a7236a3", url: "https://www.bitstamp.net/" }
     ];
     const newsCard = n => `<a class="news-card" href="${n.url}" target="_blank" rel="noopener"><img src="https://images.unsplash.com/${n.image}?auto=format&fit=crop&w=900&q=80" alt=""><span class="eyebrow">${n.region}</span><h3>${n.title}</h3><p>${n.copy}</p><span class="meta">Company source ↗</span></a>`;
     document.querySelector("#homeNews").innerHTML = news.slice(0, 3).map(newsCard).join("");
-    document.querySelector("#allNews").innerHTML = news.map(newsCard).join("");
+
+    const futuresContracts = {
+      "Stock Index": [
+        ["/ES", "E-mini S&P 500 Index Futures", "50", "0.25=$12.50", "Cash", "6 PM-5 PM"],
+        ["/MES", "Micro S&P 500 Index Futures", "5", "0.25=$1.25", "Cash", "6 PM-5 PM"],
+        ["/NQ", "E-mini Nasdaq 100 Index Futures", "20", "0.25=$5.00", "Cash", "6 PM-5 PM"],
+        ["/MNQ", "Micro Nasdaq 100 Index Futures", "2", "0.25=$0.50", "Cash", "6 PM-5 PM"],
+        ["/YM", "E-mini Dow Jones Index Futures", "5", "1=$5.00", "Cash", "6 PM-5 PM"],
+        ["/MYM", "Micro Dow Jones Index Futures", "0.5", "1=$0.50", "Cash", "6 PM-5 PM"],
+        ["/RTY", "E-mini Russell 2000 Index Futures", "50", "0.1=$5.00", "Cash", "6 PM-5 PM"],
+        ["/M2K", "Micro Russell 2000 Index Futures", "5", "0.1=$0.50", "Cash", "6 PM-5 PM"]
+      ],
+      Energy: [
+        ["/CL", "Crude Oil Futures", "1,000", "0.01=$10.00", "Physical", "6 PM-5 PM"],
+        ["/MCL", "Micro Crude Oil Futures", "100", "0.01=$1.00", "Physical", "6 PM-5 PM"],
+        ["/NG", "Henry Hub Natural Gas Futures", "10,000", "0.001=$10.00", "Physical", "6 PM-5 PM"]
+      ],
+      Currency: [
+        ["/6E", "Euro FX Futures", "125,000", "0.00005=$6.25", "Cash", "6 PM-5 PM"],
+        ["/M6E", "Micro Euro FX Futures", "12,500", "0.0001=$1.25", "Cash", "6 PM-5 PM"],
+        ["/6J", "Japanese Yen Futures", "12,500,000", "0.0000005=$6.25", "Cash", "6 PM-5 PM"]
+      ],
+      Metals: [
+        ["/GC", "Gold Futures", "100", "0.10=$10.00", "Physical", "6 PM-5 PM"],
+        ["/MGC", "Micro Gold Futures", "10", "0.10=$1.00", "Physical", "6 PM-5 PM"],
+        ["/SI", "Silver Futures", "5,000", "0.005=$25.00", "Physical", "6 PM-5 PM"]
+      ],
+      Crypto: [
+        ["/BTC", "Bitcoin Futures", "5", "5=$25.00", "Cash", "6 PM-5 PM"],
+        ["/MBT", "Micro Bitcoin Futures", "0.1", "5=$0.50", "Cash", "6 PM-5 PM"],
+        ["/ETH", "Ether Futures", "50", "0.25=$12.50", "Cash", "6 PM-5 PM"]
+      ]
+    };
+
+    function renderFutures(cat) {
+      const rows = futuresContracts[cat] || [];
+      document.querySelector("#futuresTableBody").innerHTML = rows.map(r =>
+        `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td></tr>`
+      ).join("");
+    }
+    renderFutures("Stock Index");
+    document.querySelectorAll("#futuresCats .futures-cat").forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll("#futuresCats .futures-cat").forEach(x => x.classList.remove("active"));
+        btn.classList.add("active");
+        renderFutures(btn.dataset.fcat);
+      };
+    });
 
     const events = [
-      ["MON · 24/7", "BTC options expiry watch", "Derivatives"],
-      ["TUE · 14:00 UTC", "ETH staking flow brief", "Earn"],
-      ["WED · 09:00 ET", "US crypto regulation roundup", "Policy"],
-      ["THU · 08:00 SGT", "Asia liquidity pulse", "Markets"],
-      ["FRI · 16:00 UTC", "Weekend risk checklist", "Risk"]
+      ["01", "Pick Yes or No", "Every contract is a binary outcome with a $1 max payout."],
+      ["02", "Price is the probability", "A Yes quote near $0.65 implies the market prices a 65% chance."],
+      ["03", "Trade or hold", "Exit early at the live price, or hold through settlement."],
+      ["04", "Limit your entry", "Use limit-style tickets for dollar or contract sizing."],
+      ["05", "Know the risks", "You can lose the full premium. Demo data is illustrative only."]
     ];
     document.querySelector("#events").innerHTML = events.map(e =>
-      `<div class="event"><time>${e[0]}</time><strong style="display:block;margin-top:6px">${e[1]}</strong><small>${e[2]}</small></div>`
+      `<div class="event"><time>STEP ${e[0]}</time><strong style="display:block;margin-top:6px">${e[1]}</strong><small>${e[2]}</small></div>`
     ).join("");
 
     const jobs = [
@@ -1048,17 +1909,28 @@
       ["Creator Partnerships Manager", "Americas, EMEA or APAC", "Develop collaborations with finance and crypto educators."]
     ];
     document.querySelector("#jobList").innerHTML = jobs.map(j =>
-      `<a class="job" href="mailto:careers@metadeel.com?subject=${encodeURIComponent(j[0])}"><div><h3>${j[0]}</h3><p>${j[1]}</p><small style="display:block;margin-top:10px;color:var(--muted)">${j[2]}</small></div><span class="arrow">→</span></a>`
+      `<button type="button" class="job" data-role="${j[0].replace(/"/g, "&quot;")}">
+        <div>
+          <h3>${j[0]}</h3>
+          <p>${j[1]}</p>
+          <small style="display:block;margin-top:10px;color:var(--muted)">${j[2]}</small>
+        </div>
+        <span class="job-apply"><span class="label">Apply</span><span class="arrow">→</span></span>
+      </button>`
     ).join("");
 
     const pages = [...document.querySelectorAll(".page")];
     const links = [...document.querySelectorAll(".nav-links a")];
     function route() {
-      const raw = location.hash.slice(1).split("?")[0] || "home";
-      const name = pages.some(p => p.dataset.page === raw) ? raw : "home";
+      let raw = location.hash.slice(1).split("?")[0] || "home";
+      if (raw === "markets") raw = "predict";
+      if (raw === "earn" || raw === "company") raw = "home";
+      const name = pages.some(p => p.dataset.page === raw && !p.hasAttribute("hidden")) ? raw : "home";
       pages.forEach(p => p.classList.toggle("active", p.dataset.page === name));
       links.forEach(a => a.classList.toggle("active", a.getAttribute("href") === `#${name}`));
       document.querySelector("#navLinks").classList.remove("open");
+      document.querySelector("#menu").setAttribute("aria-expanded", "false");
+      document.querySelector("#menu").setAttribute("aria-label", "Open menu");
       window.scrollTo({ top: 0, behavior: "auto" });
       const label = name.charAt(0).toUpperCase() + name.slice(1);
       document.title = label + " | Metadeel";
@@ -1066,7 +1938,20 @@
     addEventListener("hashchange", route);
     route();
 
-    document.querySelector("#menu").onclick = () => document.querySelector("#navLinks").classList.toggle("open");
+    const navLinks = document.querySelector("#navLinks");
+    const menuBtn = document.querySelector("#menu");
+    menuBtn.onclick = () => {
+      const open = navLinks.classList.toggle("open");
+      menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+      menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    };
+    document.addEventListener("click", (e) => {
+      if (!navLinks.classList.contains("open")) return;
+      if (e.target.closest("#navLinks") || e.target.closest("#menu")) return;
+      navLinks.classList.remove("open");
+      menuBtn.setAttribute("aria-expanded", "false");
+      menuBtn.setAttribute("aria-label", "Open menu");
+    });
     document.querySelector("#viewRoles").onclick = () => document.querySelector("#open-roles").scrollIntoView({ behavior: "smooth" });
     document.querySelectorAll(".range button").forEach(b => b.onclick = () => {
       document.querySelectorAll(".range button").forEach(x => x.classList.remove("active"));
@@ -1120,18 +2005,21 @@
       const signupBtn = document.querySelector("#signupBtn");
       const logoutBtn = document.querySelector("#logoutBtn");
       const chip = document.querySelector("#userChip");
+      const mobileAuth = document.querySelector(".nav-mobile-auth");
       if (session) {
         loginBtn.style.display = "none";
         signupBtn.style.display = "none";
         logoutBtn.style.display = "inline-flex";
         chip.classList.add("show");
+        if (mobileAuth) mobileAuth.style.display = "none";
         document.querySelector("#userName").textContent = session.name || session.email.split("@")[0];
         document.querySelector("#userAvatar").textContent = (session.name || session.email).charAt(0).toUpperCase();
       } else {
-        loginBtn.style.display = "inline-flex";
-        signupBtn.style.display = "inline-flex";
+        loginBtn.style.display = "";
+        signupBtn.style.display = "";
         logoutBtn.style.display = "none";
         chip.classList.remove("show");
+        if (mobileAuth) mobileAuth.style.display = "";
       }
     }
 
@@ -1142,17 +2030,82 @@
       const isSignup = mode === "signup";
       authTitle.textContent = isSignup ? "Sign up" : "Log in";
       authSub.textContent = isSignup
-        ? "Create a Metadeel demo account. Data stays in this browser."
+        ? "Create a Metadeel demo account. Solve captcha before social signup."
         : "Access your Metadeel demo account.";
       authSubmit.textContent = isSignup ? "Create account" : "Log in";
       authSwitchText.textContent = isSignup ? "Already have an account?" : "New to Metadeel?";
       authSwitch.textContent = isSignup ? "Log in" : "Sign up";
       nameField.style.display = isSignup ? "block" : "none";
+      document.querySelector("#signupCaptchaField").style.display = isSignup ? "block" : "none";
+      document.querySelector("#socialAuthBlock").style.display = isSignup ? "block" : "none";
       document.querySelector("#authPassword").autocomplete = isSignup ? "new-password" : "current-password";
+      if (isSignup) refreshAuthCaptcha();
+      else setSocialSignupEnabled(false);
+      navLinks.classList.remove("open");
+      menuBtn.setAttribute("aria-expanded", "false");
+      menuBtn.setAttribute("aria-label", "Open menu");
       authModal.classList.add("open");
       setTimeout(() => document.querySelector(isSignup ? "#authName" : "#authEmail").focus(), 50);
     }
     function closeAuth() { authModal.classList.remove("open"); }
+
+    let authCaptchaAnswer = 0;
+    let authCaptchaPassed = false;
+
+    function setSocialSignupEnabled(enabled) {
+      authCaptchaPassed = enabled;
+      document.querySelector("#signupGmail").disabled = !enabled;
+      document.querySelector("#signupApple").disabled = !enabled;
+      document.querySelector("#socialHint").textContent = enabled
+        ? "Captcha verified. You can continue with Gmail or Apple."
+        : "Solve the captcha first to enable Gmail and Apple signup.";
+    }
+
+    function refreshAuthCaptcha() {
+      const a = Math.floor(Math.random() * 8) + 2;
+      const b = Math.floor(Math.random() * 8) + 2;
+      authCaptchaAnswer = a + b;
+      document.querySelector("#authCaptchaPrompt").textContent = a + " + " + b + " = ?";
+      document.querySelector("#authCaptcha").value = "";
+      setSocialSignupEnabled(false);
+    }
+
+    function verifyAuthCaptcha(showError) {
+      const value = document.querySelector("#authCaptcha").value.trim();
+      if (String(authCaptchaAnswer) === value) {
+        setSocialSignupEnabled(true);
+        if (showError) authError.textContent = "";
+        return true;
+      }
+      setSocialSignupEnabled(false);
+      if (showError) authError.textContent = "Solve the captcha before continuing.";
+      return false;
+    }
+
+    document.querySelector("#authCaptchaRefresh").onclick = refreshAuthCaptcha;
+    document.querySelector("#authCaptcha").addEventListener("input", () => verifyAuthCaptcha(false));
+
+    function socialSignup(provider) {
+      if (!verifyAuthCaptcha(true)) {
+        refreshAuthCaptcha();
+        return;
+      }
+      const stamp = Date.now().toString().slice(-5);
+      const email = provider === "gmail"
+        ? "gmail.user." + stamp + "@gmail.com"
+        : "apple.user." + stamp + "@icloud.com";
+      const name = provider === "gmail" ? "Gmail User" : "Apple User";
+      const users = getUsers();
+      if (!users.some(u => u.email === email)) {
+        users.push({ name, email, password: "oauth-" + stamp, provider });
+        saveUsers(users);
+      }
+      setSession({ name, email });
+      closeAuth();
+      toast("Signed up with " + (provider === "gmail" ? "Gmail" : "Apple") + ".");
+    }
+    document.querySelector("#signupGmail").onclick = () => socialSignup("gmail");
+    document.querySelector("#signupApple").onclick = () => socialSignup("apple");
 
     document.querySelector("#loginBtn").onclick = () => openAuth("login");
     document.querySelector("#signupBtn").onclick = () => openAuth("signup");
@@ -1162,8 +2115,78 @@
     });
     document.querySelector("#authClose").onclick = closeAuth;
     authModal.addEventListener("click", (e) => { if (e.target === authModal) closeAuth(); });
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeAuth(); });
     authSwitch.onclick = () => openAuth(authMode === "login" ? "signup" : "login");
+
+    const applyModal = document.querySelector("#applyModal");
+    const applyForm = document.querySelector("#applyForm");
+    const applyError = document.querySelector("#applyError");
+    const applySub = document.querySelector("#applySub");
+    let captchaAnswer = 0;
+    let selectedRole = "";
+
+    function refreshCaptcha() {
+      const a = Math.floor(Math.random() * 8) + 2;
+      const b = Math.floor(Math.random() * 8) + 2;
+      captchaAnswer = a + b;
+      document.querySelector("#captchaPrompt").textContent = a + " + " + b + " = ?";
+      document.querySelector("#applyCaptcha").value = "";
+    }
+
+    function openApply(role) {
+      selectedRole = role || "Open role";
+      applyError.textContent = "";
+      applyForm.reset();
+      applySub.textContent = "Applying for " + selectedRole + ". Demo form only.";
+      refreshCaptcha();
+      applyModal.classList.add("open");
+      setTimeout(() => document.querySelector("#applyName").focus(), 50);
+    }
+    function closeApply() { applyModal.classList.remove("open"); }
+
+    document.querySelector("#jobList").addEventListener("click", (e) => {
+      const job = e.target.closest(".job");
+      if (!job) return;
+      openApply(job.getAttribute("data-role"));
+    });
+    document.querySelector("#applyClose").onclick = closeApply;
+    document.querySelector("#captchaRefresh").onclick = refreshCaptcha;
+    applyModal.addEventListener("click", (e) => { if (e.target === applyModal) closeApply(); });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      closeAuth();
+      closeApply();
+    });
+
+    applyForm.onsubmit = (e) => {
+      e.preventDefault();
+      applyError.textContent = "";
+      const name = document.querySelector("#applyName").value.trim();
+      const email = document.querySelector("#applyEmail").value.trim().toLowerCase();
+      const phone = document.querySelector("#applyPhone").value.trim();
+      const linkedin = document.querySelector("#applyLinkedin").value.trim();
+      const captcha = document.querySelector("#applyCaptcha").value.trim();
+      if (!name) { applyError.textContent = "Enter your full name."; return; }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        applyError.textContent = "Enter a valid email address.";
+        return;
+      }
+      if (!phone || phone.replace(/\D/g, "").length < 7) {
+        applyError.textContent = "Enter a valid phone number.";
+        return;
+      }
+      if (!linkedin || !/^https?:\/\/(www\.)?linkedin\.com\/.+/i.test(linkedin)) {
+        applyError.textContent = "Enter a full LinkedIn profile URL.";
+        return;
+      }
+      if (String(captchaAnswer) !== captcha) {
+        applyError.textContent = "Captcha answer is incorrect. Try again.";
+        refreshCaptcha();
+        return;
+      }
+      closeApply();
+      toast("Application received for " + selectedRole + ".");
+    };
 
     document.querySelector("#logoutBtn").onclick = () => {
       setSession(null);
@@ -1187,6 +2210,10 @@
       const users = getUsers();
       if (authMode === "signup") {
         if (!name) { authError.textContent = "Enter your name."; return; }
+        if (!verifyAuthCaptcha(true)) {
+          refreshAuthCaptcha();
+          return;
+        }
         if (users.some(u => u.email === email)) {
           authError.textContent = "An account with this email already exists. Try logging in.";
           return;
@@ -1209,8 +2236,120 @@
       }
     };
 
+    document.querySelectorAll("#assetTabs .asset-tab").forEach(btn => {
+      btn.onclick = () => {
+        const key = btn.dataset.asset;
+        document.querySelectorAll("#assetTabs .asset-tab").forEach(x => x.classList.remove("active"));
+        document.querySelectorAll("[data-asset-panel]").forEach(panel => {
+          panel.classList.toggle("active", panel.getAttribute("data-asset-panel") === key);
+        });
+        btn.classList.add("active");
+      };
+    });
+
     syncAuthUI();
     loadPrices();
+
+    (function setupToolFeatureVideo() {
+      const video = document.querySelector("#toolFeatureVideo");
+      if (!video) return;
+      const desktop = "https://videos.ctfassets.net/ilblxxee70tt/4uqH6hItQGnSkGsZfS1XOS/e6a75430597301373266b2cb06021d41/RH25_Strategies_GTM_dotcom_productHeader_1900X1183_v43.webm";
+      const mobile = "https://videos.ctfassets.net/ilblxxee70tt/7cMP9f0SZpq87tmimD9kT7/c2c56de1b6ad8c4388a12ea832a92b37/RH25_Strategies_GTM_dotcom_productHeader_mobile_1125x800_v12.webm";
+      const poster = "https://images.ctfassets.net/ilblxxee70tt/eoyQNjVlwAvxnXVULNWq2/f859ea70f2acb72f391ff4fd1bc0aa28/RH25_Strategies_GTM_dotcom_productHeader_1900X1183_v43__00525_.jpg";
+      let current = "";
+      const apply = () => {
+        const next = window.matchMedia("(max-width: 768px)").matches ? mobile : desktop;
+        if (next === current) return;
+        current = next;
+        video.poster = poster;
+        video.src = next;
+        video.load();
+        video.play().catch(() => {});
+      };
+      apply();
+      addEventListener("resize", apply);
+    })();
+
+    (function setupHeroVisualVideo() {
+      const video = document.querySelector("#heroVisualVideo");
+      if (!video) return;
+      const wide = "https://videos.ctfassets.net/ilblxxee70tt/5osvHuzQnK4SVRssxz040V/ab2657a9e672f9c667268a5d17eed2f9/RH26_Venture_FundII_Dot-com_hero_2560x1080_v01_high.mp4";
+      const desktop = "https://videos.ctfassets.net/ilblxxee70tt/27DOJRBieXlp4r4UCojWjd/f851711694504a13536fcbf651576a51/RH26_Venture_FundII_Dot-com_hero_3840x2160_v01_med.mp4";
+      const mobile = "https://videos.ctfassets.net/ilblxxee70tt/5xOGO4gRjyecPhpV1aZ6wd/56700e220148813b72cf09c335f3dfe2/RH26_Venture_FundII_Dot-com_hero_880x2250_v01_high.mp4";
+      const poster = "https://images.ctfassets.net/ilblxxee70tt/ldOjI76QGBdyouqxwQXoe/e1c25ff605c127099f75b29965f7d377/RH26_Venture_FundII_Dot-com_hero_3840x2160.jpeg";
+      let current = "";
+      const pick = () => {
+        if (window.matchMedia("(max-width: 768px)").matches) return mobile;
+        if (window.matchMedia("(min-width: 1280px)").matches) return wide;
+        return desktop;
+      };
+      const apply = () => {
+        const next = pick();
+        if (next === current) return;
+        current = next;
+        video.poster = poster;
+        video.src = next;
+        video.load();
+        video.play().catch(() => {});
+      };
+      apply();
+      addEventListener("resize", apply);
+    })();
+
+    (function setupPredictHeroVideo() {
+      const video = document.querySelector("#predictHeroVideo");
+      if (!video) return;
+      const wide = "https://videos.ctfassets.net/ilblxxee70tt/1O7iI8dX3hFIJKn5Zs8t3X/63d3ac487ced4bd5c45130ea3c9b1235/RH26_GoldLP_Hero_Header_Wide_Desktop.mp4";
+      const desktop = "https://videos.ctfassets.net/ilblxxee70tt/2leucqTEXna9qgR25KPihV/e464374eedca3ba3ffed81f6aefead5b/RH26_GoldLP_Hero_Header_Desktop.mp4";
+      const tablet = "https://videos.ctfassets.net/ilblxxee70tt/47rmdQ538hGkFJgElGEU8G/bcde287d5cbfd25d344a26220c20c76b/RH26_GoldLP_Hero_Header_Tablet.mp4";
+      const mobile = "https://videos.ctfassets.net/ilblxxee70tt/2c2fwyxCfvzqoValmEny6E/93d17371c450a9277108a892d52afc1f/RH26_GoldLP_Hero_Header_Mobile.mp4";
+      const poster = "https://images.ctfassets.net/ilblxxee70tt/3UGytPhHvr5vdBZmjJ2PZG/6d3f5e727e80c2a74e42817fa1f6f062/01_gold_hero_desktop.jpg";
+      let current = "";
+      const pick = () => {
+        if (window.matchMedia("(max-width: 760px)").matches) return mobile;
+        if (window.matchMedia("(max-width: 1200px)").matches) return tablet;
+        if (window.matchMedia("(min-width: 1280px)").matches) return wide;
+        return desktop;
+      };
+      const apply = () => {
+        const next = pick();
+        if (next === current) return;
+        current = next;
+        video.poster = poster;
+        video.src = next;
+        video.load();
+        video.play().catch(() => {});
+      };
+      apply();
+      addEventListener("resize", apply);
+    })();
+
+    (function setupTradeHeroVideo() {
+      const video = document.querySelector("#tradeHeroVideo");
+      if (!video) return;
+      video.poster = "https://images.ctfassets.net/ilblxxee70tt/1F2ht3quwEPy3AARoemyvy/31ce86be060ec7a885077603928aacd0/Robinhood_Bats_SH04_JetEnginePre_Copy_01.00_00_00_29.Still006__1_.jpg";
+      video.play().catch(() => {});
+    })();
+
+    (function setupLadderTradeVideo() {
+      const video = document.querySelector("#ladderTradeVideo");
+      if (!video) return;
+      const desktop = "https://videos.ctfassets.net/ilblxxee70tt/DzG2drvtCOqZdnwRICNQK/6782ffb7a4d98caf18e7af0b9e677a03/Ladder_web_module_2880x874.mp4";
+      const mobile = "https://videos.ctfassets.net/ilblxxee70tt/3PwTGyAzTuWb4CfpesMxkF/33cf770c840d84d15fe118019e9e5e38/Ladder_web_module_mobile_1275x975_1.mp4";
+      const poster = "https://images.ctfassets.net/ilblxxee70tt/46JNKYLAOktrd1adpfSASu/f8bb3ca06ab14a87908fc709edb305cb/Frame_1533208558.png";
+      let current = "";
+      const apply = () => {
+        const next = window.matchMedia("(max-width: 768px)").matches ? mobile : desktop;
+        if (next === current) return;
+        current = next;
+        video.poster = poster;
+        video.src = next;
+        video.load();
+        video.play().catch(() => {});
+      };
+      apply();
+      addEventListener("resize", apply);
+    })();
   </script>
 </body>
 </html>
