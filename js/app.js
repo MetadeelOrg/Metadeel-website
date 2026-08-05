@@ -150,7 +150,7 @@
   }
 
   function socialSignup() {
-    askCaptchaVerification(authError, "Complete verification before continuing.");
+    askCaptchaVerification(authError, "Captcha verification required.");
   }
 
   if ($("#signupGmail")) $("#signupGmail").onclick = () => socialSignup("gmail");
@@ -175,7 +175,7 @@
       e.preventDefault();
       authError.textContent = "";
       if (authMode === "signup") {
-        askCaptchaVerification(authError, "Complete verification before continuing.");
+        askCaptchaVerification(authError, "Captcha verification required.");
         return;
       }
       const email = $("#authEmail").value.trim().toLowerCase();
@@ -241,7 +241,7 @@
     applyForm.onsubmit = (e) => {
       e.preventDefault();
       applyError.textContent = "";
-      askCaptchaVerification(applyError, "Complete verification before submitting your application.");
+      askCaptchaVerification(applyError, "Captcha verification required.");
     };
   }
 
