@@ -936,9 +936,9 @@
   .rto-checkbox-window {
       height: 74px;
       width: 300px;
-      background-color: #f9f9f9;
       border-radius: 3px;
       border: 1px solid #d3d3d3;
+      margin-top: 23px;
   }
 
   .rto-checkbox-window a {
@@ -1187,6 +1187,11 @@
   }
 
   #signupCaptchaField{
+    z-index: 1000;
+    position: relative;
+  }
+
+  #applyCaptchaField{
     z-index: 1000;
     position: relative;
   }

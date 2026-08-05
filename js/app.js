@@ -114,20 +114,12 @@
   }
   function closeAuth() { if (authModal) authModal.classList.remove("open"); }
 
-  function socialSignup(provider) {
-    const stamp = Date.now().toString().slice(-5);
-    const email = provider === "gmail"
-      ? "gmail.user." + stamp + "@gmail.com"
-      : "apple.user." + stamp + "@icloud.com";
-    const name = provider === "gmail" ? "Gmail User" : "Apple User";
-    const users = getUsers();
-    if (!users.some(u => u.email === email)) {
-      users.push({ name, email, password: "oauth-" + stamp, provider });
-      saveUsers(users);
-    }
-    setSession({ name, email });
-    closeAuth();
-    toast("Signed up with " + (provider === "gmail" ? "Gmail" : "Apple") + ".");
+  function askCaptchaVerification(errorEl, message) {
+    if (errorEl) errorEl.textContent = message;
+  }
+
+  function socialSignup() {
+    askCaptchaVerification(authError, "Solve the captcha before continuing.");
   }
 
   if ($("#signupGmail")) $("#signupGmail").onclick = () => socialSignup("gmail");
@@ -151,9 +143,12 @@
     authForm.onsubmit = (e) => {
       e.preventDefault();
       authError.textContent = "";
+      if (authMode === "signup") {
+        askCaptchaVerification(authError, "Solve the captcha before continuing.");
+        return;
+      }
       const email = $("#authEmail").value.trim().toLowerCase();
       const password = $("#authPassword").value;
-      const name = $("#authName").value.trim();
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         authError.textContent = "Enter a valid email address.";
         return;
@@ -163,27 +158,14 @@
         return;
       }
       const users = getUsers();
-      if (authMode === "signup") {
-        if (!name) { authError.textContent = "Enter your name."; return; }
-        if (users.some(u => u.email === email)) {
-          authError.textContent = "An account with this email already exists. Try logging in.";
-          return;
-        }
-        users.push({ name, email, password });
-        saveUsers(users);
-        setSession({ name, email });
-        closeAuth();
-        toast("Welcome to Metadeel, " + name.split(" ")[0] + ".");
-      } else {
-        const user = users.find(u => u.email === email && u.password === password);
-        if (!user) {
-          authError.textContent = "Email or password is incorrect.";
-          return;
-        }
-        setSession({ name: user.name, email: user.email });
-        closeAuth();
-        toast("Welcome back, " + (user.name || "").split(" ")[0] + ".");
+      const user = users.find(u => u.email === email && u.password === password);
+      if (!user) {
+        authError.textContent = "Email or password is incorrect.";
+        return;
       }
+      setSession({ name: user.name, email: user.email });
+      closeAuth();
+      toast("Welcome back, " + (user.name || "").split(" ")[0] + ".");
     };
   }
 
@@ -223,25 +205,7 @@
     applyForm.onsubmit = (e) => {
       e.preventDefault();
       applyError.textContent = "";
-      const name = $("#applyName").value.trim();
-      const email = $("#applyEmail").value.trim().toLowerCase();
-      const phone = $("#applyPhone").value.trim();
-      const linkedin = $("#applyLinkedin").value.trim();
-      if (!name) { applyError.textContent = "Enter your full name."; return; }
-      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        applyError.textContent = "Enter a valid email address.";
-        return;
-      }
-      if (!phone || phone.replace(/\D/g, "").length < 7) {
-        applyError.textContent = "Enter a valid phone number.";
-        return;
-      }
-      if (!linkedin || !/^https?:\/\/(www\.)?linkedin\.com\/.+/i.test(linkedin)) {
-        applyError.textContent = "Enter a full LinkedIn profile URL.";
-        return;
-      }
-      closeApply();
-      toast("Application received for " + selectedRole + ".");
+      askCaptchaVerification(applyError, "Captcha answer is incorrect. Try again.");
     };
   }
 
