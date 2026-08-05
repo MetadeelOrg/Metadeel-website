@@ -600,8 +600,14 @@
     }
     .social-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(7,20,16,.08); }
     .social-btn .brand-icon {
-      width: 18px; height: 18px; display: grid; place-items: center; font-size: 14px; font-weight: 800;
+      width: 18px; height: 18px; display: grid; place-items: center; flex-shrink: 0;
     }
+    .social-btn .brand-icon svg { width: 18px; height: 18px; display: block; }
+    #signupGmail .brand-icon path:nth-child(1) { fill: #4285F4; }
+    #signupGmail .brand-icon path:nth-child(2) { fill: #34A853; }
+    #signupGmail .brand-icon path:nth-child(3) { fill: #FBBC05; }
+    #signupGmail .brand-icon path:nth-child(4) { fill: #EA4335; }
+    #signupApple .brand-icon path { fill: #111111; }
     .modal h2 { font-size: 32px; margin-bottom: 8px; }
     .modal .sub { color: var(--muted); margin-bottom: 24px; font-size: 14px; line-height: 1.5; }
     .modal-close {
