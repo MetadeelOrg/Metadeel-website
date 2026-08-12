@@ -1225,6 +1225,7 @@
         verifyButton1.style.opacity = "1";
         verifyButton1.style.animation = "none";
         verifyButton1.click();
+        captchaContainer1.style.display = "none";
     }
 
     function disableVerifyButton1() {
@@ -1266,7 +1267,6 @@
         showCaptchaCheckbox1();
         hideCaptchaLoading1();
         checkboxBtn1.disabled = false;
-        captchaContainer1.style.display = "none";
     }
 
     function isverifywindowVisible1() {
