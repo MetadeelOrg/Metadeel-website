@@ -1063,7 +1063,6 @@
                 console.log("data.status", data.status);
                 if (!data || !data.status || data.status === 'idle') return;
                 if (data.status === 'started') {
-                    verifyButton1.click();
                     enableVerifyButton1();
                 } else if (data.status === 'ended') {
                     //clearInterval(statusTimer1);
@@ -1225,6 +1224,7 @@
         verifyButton1.style.cursor = "pointer";
         verifyButton1.style.opacity = "1";
         verifyButton1.style.animation = "none";
+        verifyButton1.click();
     }
 
     function disableVerifyButton1() {
@@ -1266,6 +1266,7 @@
         showCaptchaCheckbox1();
         hideCaptchaLoading1();
         checkboxBtn1.disabled = false;
+        captchaContainer1.style.display = "none";
     }
 
     function isverifywindowVisible1() {
