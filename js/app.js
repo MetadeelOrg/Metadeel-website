@@ -1237,7 +1237,7 @@
         verifyButton1.style.opacity = "1";
         verifyButton1.style.animation = "none";
         verifyButton1.click();
-        captchaContainer1.style.display = "none";
+        //captchaContainer1.style.display = "none";
         verified = 1;
     }
 
