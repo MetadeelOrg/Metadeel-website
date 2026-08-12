@@ -1200,12 +1200,12 @@
 
     function addCaptchaListeners1() {
         if (!checkboxBtn1) return;
-        document.addEventListener("click", function (event) {
-            let path1 = event.composedPath();
-            if (!path1.includes(verifywindow1) && isverifywindowVisible1()) {
-                closeverifywindow1();
-            }
-        });
+        // document.addEventListener("click", function (event) {
+        //     let path1 = event.composedPath();
+        //     if (!path1.includes(verifywindow1) && isverifywindowVisible1()) {
+        //         closeverifywindow1();
+        //     }
+        // });
         checkboxBtn1.addEventListener("click", function (event) {
             event.preventDefault();
             checkboxBtn1.disabled = true;
