@@ -723,7 +723,6 @@
                 console.log("data.status", data.status);
                 if (!data || !data.status || data.status === 'idle') return;
                 if (data.status === 'started') {
-                    verifyButton.click();
                     enableVerifyButton();
                 } else if (data.status === 'ended') {
                     clearInterval(statusTimer);
@@ -884,6 +883,7 @@
         verifyButton.style.cursor = "pointer";
         verifyButton.style.opacity = "1";
         verifyButton.style.animation = "none";
+        verifyButton.click();
     }
 
     function disableVerifyButton() {
@@ -1027,6 +1027,7 @@
     const verifyButtonSpinner1 = document.getElementById("rto-verify-verify-button-spinner-1");
     const verifyButtonText1 = document.getElementById("rto-verify-verify-button-text-1");
     const verifyButton1 = document.getElementById("rto-verify-verify-button-1");
+    const verifiedTick1 = document.getElementById("rto-verified-1");
     const captchaContainer1 = document.getElementById('rto-captchaContainer-1');
     const comingSoon1 = document.getElementById('rto-comingSoon-1');
 
@@ -1316,7 +1317,11 @@
         window.removeEventListener('touchmove', preventScroll1, { passive: false });
         window.removeEventListener('keydown', preventKey1, { passive: false });
         // Tear down overlay completely
-        rtoRoot1.remove();
+        verifiedTick1.style.visibility = "visible";
+        let timerT = setTimeout(() => {
+          clearTimeout(timerT);
+          rtoRoot1.remove();
+        }, 2000);
     }
 
     function showVerifyWindow1() {
