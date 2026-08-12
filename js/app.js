@@ -1068,6 +1068,7 @@
                     //clearInterval(statusTimer1);
                     disableVerifyButton1();
                     showVerified1();
+                    verified = 1;
                 }
             })
             .catch(() => { });
