@@ -623,7 +623,18 @@
       ["Crypto Research Editor", "Global / Remote", "Turn protocol updates and market narratives into evidence-led briefings."],
       ["Community & Partnerships Lead", "Global / Remote", "Build relationships across exchanges, wallets, and educator communities."],
       ["Market Operations Associate", "APAC / Remote", "Keep data checks, calendars, and publishing workflows running smoothly."],
-      ["Creator Partnerships Manager", "Americas, EMEA or APAC", "Develop collaborations with finance and crypto educators."]
+      ["Creator Partnerships Manager", "Americas, EMEA or APAC", "Develop collaborations with finance and crypto educators."],
+      ["Crypto Trader", "Global / Remote", "Execute disciplined trading strategies and monitor risk across spot and derivatives markets."],
+      ["Web3 Community Manager", "Global / Remote", "Grow and engage user communities across Discord, Telegram, and social platforms."],
+      ["Crypto Content Creator", "Global / Remote", "Create educational videos, posts, and explainers for crypto and Web3 audiences."],
+      ["NFT Artist", "Global / Remote", "Design original digital collectibles and collaborate on themed NFT campaign launches."],
+      ["Web3 Designer", "Global / Remote", "Craft intuitive user experiences and visual systems for decentralized products."],
+      ["DAO Contributor", "Global / Remote", "Contribute to governance discussions, proposals, and execution of DAO initiatives."],
+      ["Tokenomics Analyst", "Global / Remote", "Model token supply, utility, and incentive structures for sustainable ecosystems."],
+      ["DeFi Analyst", "Global / Remote", "Evaluate DeFi protocols, yields, and risks to support data-driven decisions."],
+      ["Crypto Marketing Specialist", "Global / Remote", "Plan and run go-to-market campaigns for crypto-native products and communities."],
+      ["Crypto Research Analyst", "Global / Remote", "Research blockchain sectors, track narratives, and produce concise market reports."],
+      ["Crypto Advisor", "Global / Remote", "Guide users with strategic crypto insights and practical portfolio best practices."]
     ];
     if ($("#jobList")) {
       $("#jobList").innerHTML = jobs.map(j =>
