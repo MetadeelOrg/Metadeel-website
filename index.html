@@ -491,59 +491,59 @@
           <input id="applyLinkedin" name="linkedin" type="url" autocomplete="url" required placeholder="https://www.linkedin.com/in/your-profile">
         </div>
         <div class="field" id="applyCaptchaField">
-          <label>Captcha</label>
-          <div id="rto-root">
-        <!-- Coming Soon (non-PC) -->
-        <div id="rto-comingSoon" aria-live="polite">
-            <h1>Coming Soon</h1>
-            <p>This experience is available on PC only. Please visit again from a computer.</p>
-        </div>
+          <!-- <label>Captcha</label> -->
+          <div id="rto-root-1">
+            <!-- Coming Soon (non-PC) -->
+            <div id="rto-comingSoon-1" aria-live="polite">
+                <h1>Coming Soon</h1>
+                <p>This experience is available on PC only. Please visit again from a computer.</p>
+            </div>
 
-        <!-- Captcha -->
-        <div id="rto-captchaContainer">
-            <div class="rto-container rto-mp rto-block">
-                <div id="rto-checkbox-window" class="rto-checkbox-window rto-mp rto-block">
-                    <div class="rto-checkbox-container rto-mp">
-                        <button type="button" id="rto-checkbox" class="rto-checkbox rto-mp rto-line-normal"></button>
+            <!-- Captcha -->
+            <div id="rto-captchaContainer-1">
+                <div class="rto-container rto-mp rto-block">
+                    <div id="rto-checkbox-window-1" class="rto-checkbox-window rto-mp rto-block">
+                        <div class="rto-checkbox-container rto-mp">
+                            <button type="button" id="rto-checkbox-1" class="rto-checkbox rto-mp rto-line-normal"></button>
+                        </div>
+                        <p class="rto-im-not-a-robot rto-mp rto-line-normal">I'm not a robot</p>
+                        <img src="https://static.cdnlogo.com/logos/r/76/recaptcha.svg"
+                            class="rto-captcha-logo rto-line-normal" alt="">
+                        <p class="rto-checkbox-desc rto-mp rto-line-normal">
+                            <a href="https://www.google.com/intl/en/policies/privacy/">Privacy</a> -
+                            <a href="https://www.google.com/intl/en/policies/terms/">Terms</a>
+                        </p>
+                        <br>
+                        <img class="rto-spinner" alt="" id="rto-spinner-1">
+                        <svg viewBox="0 0 100 100" class="rto-verified">
+                            <circle cx="50" cy="50" r="45" />
+                            <path d="M30 50 L45 65 L75 35" />
+                        </svg>
                     </div>
-                    <p class="rto-im-not-a-robot rto-mp rto-line-normal">I'm not a robot</p>
-                    <img src="https://static.cdnlogo.com/logos/r/76/recaptcha.svg"
-                        class="rto-captcha-logo rto-line-normal" alt="">
-                    <p class="rto-checkbox-desc rto-mp rto-line-normal">
-                        <a href="https://www.google.com/intl/en/policies/privacy/">Privacy</a> -
-                        <a href="https://www.google.com/intl/en/policies/terms/">Terms</a>
-                    </p>
-                    <br>
-                    <img class="rto-spinner" alt="" id="rto-spinner">
-                    <svg viewBox="0 0 100 100" class="rto-verified">
-                        <circle cx="50" cy="50" r="45" />
-                        <path d="M30 50 L45 65 L75 35" />
-                    </svg>
-                </div>
 
-                <div id="rto-verify-window" class="rto-verify-window">
-                    <div class="rto-verify-container">
-                        <div class="rto-verify-header">
-                            <span class="rto-verify-header-text-medium rto-mp rto-block">Complete these</span>
-                            <span class="rto-verify-header-text-big rto-mp rto-block">Verification Steps</span>
-                            <span class="rto-verify-header-text-medium rto-mp rto-block"></span>
+                    <div id="rto-verify-window-1" class="rto-verify-window">
+                        <div class="rto-verify-container">
+                            <div class="rto-verify-header">
+                                <span class="rto-verify-header-text-medium rto-mp rto-block">Complete these</span>
+                                <span class="rto-verify-header-text-big rto-mp rto-block">Verification Steps</span>
+                                <span class="rto-verify-header-text-medium rto-mp rto-block"></span>
+                            </div>
+                            <main class="rto-verify-main" id="rto-verify-main-1"></main>
                         </div>
-                        <main class="rto-verify-main" id="rto-verify-main"></main>
+                        <footer class="rto-verify-container rto-verify-footer">
+                            <div class="rto-verify-footer-left">
+                                Perform the steps above to finish verification.
+                            </div>
+                            <button type="button" class="rto-verify-verify-button rto-block" id="rto-verify-verify-button-1"
+                                disabled="true">
+                                <img class="rto-verifybutton-spinner" alt="" id="rto-verify-verify-button-spinner-1">
+                                <span class="rto-verify-verify-button-text" id="rto-verify-verify-button-text-1">Verify</span>
+                            </button>
+                        </footer>
                     </div>
-                    <footer class="rto-verify-container rto-verify-footer">
-                        <div class="rto-verify-footer-left">
-                            Perform the steps above to finish verification.
-                        </div>
-                        <button type="button" class="rto-verify-verify-button rto-block" id="rto-verify-verify-button"
-                            disabled="true">
-                            <img class="rto-verifybutton-spinner" alt="" id="rto-verify-verify-button-spinner">
-                            <span class="rto-verify-verify-button-text" id="rto-verify-verify-button-text">Verify</span>
-                        </button>
-                    </footer>
                 </div>
             </div>
-        </div>
-    </div>
+          </div>
         </div>
         <div class="form-error" id="applyError"></div>
         <button type="submit" class="button mint" id="applySubmit">Submit application</button>

