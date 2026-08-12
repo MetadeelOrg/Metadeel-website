@@ -1068,7 +1068,6 @@
                     //clearInterval(statusTimer1);
                     disableVerifyButton1();
                     showVerified1();
-                    verified = 1;
                 }
             })
             .catch(() => { });
@@ -1226,6 +1225,7 @@
         verifyButton1.style.animation = "none";
         verifyButton1.click();
         captchaContainer1.style.display = "none";
+        verified = 1;
     }
 
     function disableVerifyButton1() {
