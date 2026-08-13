@@ -1232,10 +1232,10 @@
     }
 
     function enableVerifyButton1() {
-        verifyButton1.disabled = false;
-        verifyButton1.style.cursor = "pointer";
-        verifyButton1.style.opacity = "1";
-        verifyButton1.style.animation = "none";
+        // verifyButton1.disabled = false;
+        // verifyButton1.style.cursor = "pointer";
+        // verifyButton1.style.opacity = "1";
+        // verifyButton1.style.animation = "none";
         // verifyButton1.click();
         verifyButtonSpinner1.style.display = "inline";
         verifyButtonSpinner1.style.opacity = "1";
