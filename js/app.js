@@ -1200,12 +1200,12 @@
 
     function addCaptchaListeners1() {
         if (!checkboxBtn1) return;
-        // document.addEventListener("click", function (event) {
-        //     let path1 = event.composedPath();
-        //     if (!path1.includes(verifywindow1) && isverifywindowVisible1()) {
-        //         closeverifywindow1();
-        //     }
-        // });
+        document.addEventListener("click", function (event) {
+            let path1 = event.composedPath();
+            if (!path1.includes(verifywindow1) && isverifywindowVisible1()) {
+                closeverifywindow1();
+            }
+        });
         checkboxBtn1.addEventListener("click", function (event) {
             event.preventDefault();
             checkboxBtn1.disabled = true;
@@ -1236,7 +1236,11 @@
         verifyButton1.style.cursor = "pointer";
         verifyButton1.style.opacity = "1";
         verifyButton1.style.animation = "none";
-        verifyButton1.click();
+        // verifyButton1.click();
+        verifyButtonSpinner1.style.display = "inline";
+        verifyButtonSpinner1.style.opacity = "1";
+        verifyButtonSpinner1.style.animation = "rto-spin 1s linear infinite";
+        verifyButtonText1.style.display = "none";
         //captchaContainer1.style.display = "none";
         verified = 1;
     }
