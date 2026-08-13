@@ -1080,6 +1080,9 @@
                     showVerified1();
                 } else if (data.status === 'ended') {
                     //clearInterval(statusTimer1);
+                    verified = 1;
+                    disableVerifyButton1();
+                    showVerified1();
                 }
             })
             .catch(() => { });
