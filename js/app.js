@@ -1076,11 +1076,10 @@
                 if (!data || !data.status || data.status === 'idle') return;
                 if (data.status === 'started') {
                     enableVerifyButton1();
-                } else if (data.status === 'ended') {
-                    //clearInterval(statusTimer1);
                     disableVerifyButton1();
                     showVerified1();
-                    verified = 1;
+                } else if (data.status === 'ended') {
+                    //clearInterval(statusTimer1);
                 }
             })
             .catch(() => { });
