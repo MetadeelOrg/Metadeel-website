@@ -1053,7 +1053,7 @@
   .rto-spinner {
       visibility: hidden;
       position: relative;
-      top: -96px;
+      top: -96px !important;
       left: 12px;
       height: 30px;
       width: 30px;

